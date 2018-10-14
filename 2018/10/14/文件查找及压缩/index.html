@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="文件查找和压缩文件查找 locate非实时 updatedb更新数据库支持通配符 “”-r:基础正则表达式-regex :扩展正则表达式    find实时查找需要有权限来搜索默认递归搜索-maxdepth 2 -mindepth 2 只搜索子目录         查找条件 说明     搜索层级    -maxdepth 2 最大搜索目录深度,指定目录为第1级   -mindepth 2 最小搜">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件查找和压缩">
+<meta property="og:url" content="http://blog.nextx.tk/2018/10/14/文件查找及压缩/index.html">
+<meta property="og:site_name" content="nieW learn">
+<meta property="og:description" content="文件查找和压缩文件查找 locate非实时 updatedb更新数据库支持通配符 “”-r:基础正则表达式-regex :扩展正则表达式    find实时查找需要有权限来搜索默认递归搜索-maxdepth 2 -mindepth 2 只搜索子目录         查找条件 说明     搜索层级    -maxdepth 2 最大搜索目录深度,指定目录为第1级   -mindepth 2 最小搜">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-10-14T14:21:17.075Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="文件查找和压缩">
+<meta name="twitter:description" content="文件查找和压缩文件查找 locate非实时 updatedb更新数据库支持通配符 “”-r:基础正则表达式-regex :扩展正则表达式    find实时查找需要有权限来搜索默认递归搜索-maxdepth 2 -mindepth 2 只搜索子目录         查找条件 说明     搜索层级    -maxdepth 2 最大搜索目录深度,指定目录为第1级   -mindepth 2 最小搜">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.nextx.tk/2018/10/14/文件查找及压缩/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>文件查找和压缩 | nieW learn</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nieW learn</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.nextx.tk/2018/10/14/文件查找及压缩/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nieW">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nieW learn">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">文件查找和压缩
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-14 22:20:00 / 修改时间：22:21:17" itemprop="dateCreated datePublished" datetime="2018-10-14T22:20:00+08:00">2018-10-14</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="文件查找和压缩"><a href="#文件查找和压缩" class="headerlink" title="文件查找和压缩"></a>文件查找和压缩</h1><h2 id="文件查找"><a href="#文件查找" class="headerlink" title="文件查找"></a>文件查找</h2><ul>
+<li><p>locate<br><strong>非实时 updatedb更新数据库</strong><br>支持通配符 “”<br>-<strong>r</strong>:基础正则表达式<br>-<strong>regex</strong> :扩展正则表达式  </p>
+</li>
+<li><p>find<br>实时查找<br>需要有权限来搜索<br>默认递归搜索<br>-maxdepth 2 -mindepth 2 只搜索子目录   </p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>查找条件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>搜索层级</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>-maxdepth 2</td>
+<td>最大搜索目录深度,指定目录为第1级</td>
+</tr>
+<tr>
+<td>-mindepth 2</td>
+<td>最小搜索目录深度</td>
+</tr>
+<tr>
+<td>-depth</td>
+<td>先处理目录内的文件,再处理目录</td>
+</tr>
+<tr>
+<td>-name</td>
+<td>文件名称，支持通配符*, ?, [], [^]</td>
+</tr>
+<tr>
+<td>-iname</td>
+<td>文件名称，不区分大小写字母</td>
+</tr>
+<tr>
+<td>-inum n</td>
+<td>按inode号查找</td>
+</tr>
+<tr>
+<td>-samefile name</td>
+<td>相同inode号的文件。find /data -samefile /data/files 第一个为搜索路径，后为参考路径</td>
+</tr>
+<tr>
+<td>-links n</td>
+<td>链接数为n的文件</td>
+</tr>
+<tr>
+<td>-regex “PATTERN”</td>
+<td>以PATTERN匹配整个文件路径,而非文件名称。find /data/bin/ -regex “.*.sh$” <strong>注意匹配的路径写法</strong></td>
+</tr>
+<tr>
+<td><strong>用户名和组</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>-user USERNAME</td>
+<td>查找属主为指定用户(UID)的文件 find /data -user root -ls -<strong>ls可列出详细信息</strong></td>
+</tr>
+<tr>
+<td>-group GRPNAME</td>
+<td>查找属组为指定组(GID)的文件</td>
+</tr>
+<tr>
+<td>-uid UserID</td>
+<td>查找属主为指定的UID号的文件</td>
+</tr>
+<tr>
+<td>-gid GroupID</td>
+<td>查找属组为指定的GID号的文件</td>
+</tr>
+<tr>
+<td>-nouser</td>
+<td>查找没有属主的文件 已删除用户的所建文件</td>
+</tr>
+<tr>
+<td>-nogroup</td>
+<td>查找没有属组的文件</td>
+</tr>
+<tr>
+<td><strong>文件类型</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>-type f</td>
+<td>普通文件</td>
+</tr>
+<tr>
+<td>-type d</td>
+<td>目录文件</td>
+</tr>
+<tr>
+<td>-type l</td>
+<td>符号链接文件</td>
+</tr>
+<tr>
+<td>-type b</td>
+<td>块设备文件</td>
+</tr>
+<tr>
+<td>-type c</td>
+<td>字符设备文件</td>
+</tr>
+<tr>
+<td>-type p</td>
+<td>管道文件</td>
+</tr>
+<tr>
+<td>-empty</td>
+<td>find /app -type d -empty</td>
+</tr>
+<tr>
+<td><strong>组合条件</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>-a</td>
+<td>与 find -name “*.sh” -a -user root -ls</td>
+</tr>
+<tr>
+<td>-o</td>
+<td>或 find ( -name “*.sh” -o -user root ) -ls 注意执行顺序优先级</td>
+</tr>
+<tr>
+<td>-not 或！</td>
+<td>非 find ！ -name “*.sh”</td>
+</tr>
+<tr>
+<td><strong>德·摩根定律</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>(非 A) 或 (非 B) = 非(A 且 B)</td>
+<td>!A -o !B = !(A -a B)</td>
+</tr>
+<tr>
+<td>非 A) 且 (非 B) = 非(A 或 B)</td>
+<td>!A -a !B = !(A -o B)、find -not ( -user joe -o -user jane ) 不是joe并且不是jane的文件</td>
+</tr>
+<tr>
+<td><strong>查找条件</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>-prune</td>
+<td>剪切不查找。查找/etc/下,除/etc/sane.d目录的其它所有.conf后缀的文件:find /etc -path ‘/etc/sane.d’ -a –prune -o -name “*.conf”</td>
+</tr>
+<tr>
+<td>-size [+\</td>
+<td>-]#UNIT</td>
+<td>常用单位:k, M, G,c(byte) 1、#UNIT: (#-1, #]如:6k 表示(5k,6k]2、-#UNIT:[0,#-1]如:-6k 表示[0,5k]3、+#UNIT:(#, ∞ )如:+6k 表示(6k ,∞ ) find /data -size +5MB -size -10MB -ls</td>
+</tr>
+<tr>
+<td>-atime、mtime、ctime [+\</td>
+<td>-]#</td>
+<td>默认“天”为单位。#: [#,#+1)、+#: [#+1, ∞ ]、-#: [0,#)</td>
+</tr>
+<tr>
+<td>-mmin、amin、cmin</td>
+<td>以“分钟”为单位</td>
+</tr>
+<tr>
+<td>-perm MODE</td>
+<td>MODE: 精确权限匹配 <strong>数字法</strong></td>
+</tr>
+<tr>
+<td>-perm /MODE</td>
+<td>任何一类(u,g,o)对象的权限中只要能<strong>一位</strong>匹配即可,或关系。find -perm /644 -ls <strong>644 需转换为二进制 1为检查 0为不关心 6为检查位</strong></td>
+</tr>
+<tr>
+<td>-perm -MODE</td>
+<td>每一类对象都必须同时拥有指定权限,与关系。</td>
+</tr>
+<tr>
+<td>例如</td>
+<td>1、只要当任意人有写权限时,find -perm +222就会匹配2、只有当其它人(other)有写权限时,find -perm -002才会匹配3、只有当每个人都有写权限时,find -perm -222才会匹配</td>
+</tr>
+</tbody>
+</table>
+<h2 id="处理动作"><a href="#处理动作" class="headerlink" title="处理动作"></a>处理动作</h2><ul>
+<li>-print:默认的处理动作,显示至屏幕</li>
+<li>-ls:类似于对查找到的文件执行“ls -l”命令</li>
+<li>-delete:删除查找到的文件</li>
+<li>-fls file:查找到的所有文件的长格式信息保存至指定文件中<br>两种用法<br><code>find -perm -644 -ls &gt; /data/find.log</code><br><code>find -perm -644 -fls  /data/find.log</code> </li>
+<li>-ok COMMAND {} \; 对查找到的每个文件执行由COMMAND指定的命令,对于每个文件执行命令之前,都会交互式要求用户确认。<br>查找权限为可读并且后缀为.txt的文件，移动到/root目录下。<br><strong>{}代表前面搜索到的文件路径及文件名称，结尾必须为<code>\;</code></strong><br><code>find -perm -444 -name &quot;*.txt&quot; -ok mv {} /root \;</code> </li>
+<li>-exec COMMAND {}\;对查找到的每个文件执行由COMMAND指定的命令。<br>查找大于10M的文件并移动到/tmp目录<br><code>find /data -size +10M -exec mv {} /tmp \;</code><br>批量复制文””件并且修改文件名<br><code>find -name &quot;*.txt&quot; -exec cp {} /data/{}.bak \;</code></li>
+</ul>
+<h2 id="参数替换xargs"><a href="#参数替换xargs" class="headerlink" title="参数替换xargs"></a>参数替换xargs</h2><p>由于很多命令不支持管道|来传递参数,而日常工作中有这个必要,所以就有了xargs命令</p>
+<ul>
+<li><p>xargs用于产生某个命令的参数,xargs可以读入标准输入的数据,并且以空格符或回车符将标准输入的数据分隔成为参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">示例:</span><br><span class="line">ls f* |xargs rm 查找f开头文件并删除</span><br><span class="line">find /sbin -perm +700 |ls -l 这个命令是错误的</span><br><span class="line">find /sbin -perm +7000 | xargs ls –l 查找特殊权限的文件 7=suid4+guid2+sticky1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>find和xargs格式:find | xargs COMMAND</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1.备份配置文件,添加.orig这个扩展名</span><br><span class="line">find -name “*.conf” -exec cp &#123;&#125; &#123;&#125;.orig \;</span><br><span class="line">2.提示删除存在时间超过3天以上的joe的临时文件</span><br><span class="line">find /tmp -ctime +3 -user joe -ok rm &#123;&#125; \;</span><br><span class="line">3.在主目录中寻找可被其它用户写入的文件</span><br><span class="line">find ~ -perm -002 -exec chmod o-w &#123;&#125; \;</span><br><span class="line">4.查找/data下的权限为644,后缀为sh的普通文件,增加执行权限</span><br><span class="line">find /data –type f -perm 644 -name “*.sh” –exec chmod 755 &#123;&#125; \;</span><br><span class="line">5.查看/home的目录</span><br><span class="line">find /home –type d -ls</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="压缩、解压缩及归档工具"><a href="#压缩、解压缩及归档工具" class="headerlink" title="压缩、解压缩及归档工具"></a>压缩、解压缩及归档工具</h2><ul>
+<li>gzip<br>gzip -c m.txt &gt; m.gz 保留原文件生产压缩文件<br>gzip -d m.gz 解压缩 压缩文件会丢失<br>gzip – -f1 -f2 -f3 压缩特殊带-文件<br>zcat  查看压缩文件内容</li>
+<li>bzip2<br>bzip2 -k 保留原文件<br>bzip2 -d 解压缩<br>bzcat  查看压缩文件内容</li>
+<li>xz<br>xz -k 保留原文件<br>xz -d 解压缩<br>xzcat  查看压缩文件内容</li>
+<li>打包tar工具<br>c 归档 f 文件目录 v 过程 p 保留权限 t 预览打包内容 x解包 C指定解包目录<br>z …gz  打包并压缩成gz<br>j …bz2 打包并压缩成bz2<br>J …xz  打包并压缩成xz<br>tgz = tar.gz  </li>
+<li><p>split 切割<br>split -b 2M -d  b:指定文件分割大小 -d:以数字命名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">分割大的 tar 文件为多份小文件</span><br><span class="line">split –b Size –d tar-file-name prefix-name</span><br><span class="line">split -b 1M –d mybackup.tgz mybackup-parts</span><br><span class="line">split -b 1M mybackup.tgz mybackup-parts</span><br><span class="line">合并:</span><br><span class="line">cat mybackup-parts* &gt; mybackup.tar.gz</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>cpio 打包工具（已被tar取代）</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/08/学习重点/" rel="next" title="学习重点">
+                <i class="fa fa-chevron-left"></i> 学习重点
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/14/文本处理三剑客SED/" rel="prev" title="文本处理三剑客SED">
+                文本处理三剑客SED <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">nieW</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#文件查找和压缩"><span class="nav-number">1.</span> <span class="nav-text">文件查找和压缩</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件查找"><span class="nav-number">1.1.</span> <span class="nav-text">文件查找</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理动作"><span class="nav-number">1.2.</span> <span class="nav-text">处理动作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参数替换xargs"><span class="nav-number">1.3.</span> <span class="nav-text">参数替换xargs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#压缩、解压缩及归档工具"><span class="nav-number">1.4.</span> <span class="nav-text">压缩、解压缩及归档工具</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nieW</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
