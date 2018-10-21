@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="磁盘系统设备文件设备类型：块设备：block，存取单位“块”，磁盘字符设备：char，存取单位“字符”，键盘块设备有缓存、一般是随机的、一般是物理的硬盘等 主设备号：major number, 标识设备类型次设备号：minor number,标识同一类型下的不同设备   硬盘存储术语CHShead：磁头  8bit  255track：磁道  10bit  2^10=1024cylinder: 柱">
+<meta property="og:type" content="article">
+<meta property="og:title" content="磁盘和文件系统">
+<meta property="og:url" content="http://blog.nextx.tk/2018/10/21/磁盘和文件系统/index.html">
+<meta property="og:site_name" content="nieW learn">
+<meta property="og:description" content="磁盘系统设备文件设备类型：块设备：block，存取单位“块”，磁盘字符设备：char，存取单位“字符”，键盘块设备有缓存、一般是随机的、一般是物理的硬盘等 主设备号：major number, 标识设备类型次设备号：minor number,标识同一类型下的不同设备   硬盘存储术语CHShead：磁头  8bit  255track：磁道  10bit  2^10=1024cylinder: 柱">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-10-21T06:20:08.031Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="磁盘和文件系统">
+<meta name="twitter:description" content="磁盘系统设备文件设备类型：块设备：block，存取单位“块”，磁盘字符设备：char，存取单位“字符”，键盘块设备有缓存、一般是随机的、一般是物理的硬盘等 主设备号：major number, 标识设备类型次设备号：minor number,标识同一类型下的不同设备   硬盘存储术语CHShead：磁头  8bit  255track：磁道  10bit  2^10=1024cylinder: 柱">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.nextx.tk/2018/10/21/磁盘和文件系统/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>磁盘和文件系统 | nieW learn</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nieW learn</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.nextx.tk/2018/10/21/磁盘和文件系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nieW">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nieW learn">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">磁盘和文件系统
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-21 22:19:00 / 修改时间：14:20:08" itemprop="dateCreated datePublished" datetime="2018-10-21T22:19:00+08:00">2018-10-21</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="磁盘系统"><a href="#磁盘系统" class="headerlink" title="磁盘系统"></a>磁盘系统</h1><h2 id="设备文件"><a href="#设备文件" class="headerlink" title="设备文件"></a>设备文件</h2><p>设备类型：<br>块设备：block，存取单位“块”，磁盘<br>字符设备：char，存取单位“字符”，键盘<br>块设备有缓存、一般是随机的、一般是物理的硬盘等</p>
+<p>主设备号：major number, 标识设备类型<br>次设备号：minor number,标识同一类型下的不同设备  </p>
+<p>硬盘存储术语<br>CHS<br>head：磁头  8bit  255<br>track：磁道  10bit  2^10=1024<br>cylinder: 柱面=512bytes*sector/track*head数 8MB<br>sector: 扇区，512bytes  6bit大小 最多扇区数63  </p>
+<p>LBA（logical block addressing）<br>LBA是一个整数，通过转换成CHS格式完成磁盘具体寻址。 2002年ATA-6规范采用48位LBA，同样以每扇区512位组计算容量上限可达128 Petabytes。</p>
+<blockquote>
+<p>由于CHS寻址方式的寻址空间在大概8GB以内，所以在磁盘容量小于大概8GB<br>时，可以使用CHS寻址方式或是LBA寻址方式；在磁盘容量大于大概8GB时，则<br>只能使用LBA寻址方式</p>
+</blockquote>
+<p>ZBR<br>里外扇区数量不同，外圈更多，内圈少<br>外圈更快，磁道数更大。  </p>
+<p>盘面=磁头数  </p>
+<h3 id="MBR："><a href="#MBR：" class="headerlink" title="MBR："></a>MBR：</h3><p>使用32位表示扇区数，分区不超过2T。<br>按柱面分区 </p>
+<p>512bytes=446bytes: boot loader+64bytes：分区表，其中每16bytes标识一个分区+2bytes: 55AA结束分区  </p>
+<p>主分区：1-4<br>扩展分区：最多1  扩展+主分区 &lt;=4<br>逻辑分区：N个  </p>
+<p>MBR支持最大2TB分区<br>2^32*512=2048GB  </p>
+<p>DPT分区表64字节<br>每16字节代表一个分区的信息<br>第一个分区80代表活动分区、00代表不活动分区 </p>
+<p><strong>备份MBR分区表二进制文件</strong>   </p>
+<p>dd if=/dev/sda of=dpt bs=1 count=64 skip=446<br>hexdump -C dpt 可以查看内容<br>hexdump -C /dev/sda -n 512查看sda二进制分区信息<br>if 源路径  of  目标路径  skip 源路径操作  seek  目标路径操作<br>一定将分区表备份文件拷贝到异地<br>scp dpt 192.168.xx.xxx:/data<br>恢复分区表<br>在救援模式下首先需要配置ip地址<br>ifconfig ens33 192.168.xxx.xxx<br>将备份的文件拷贝到需要救援的机器本地目录<br>scp 192.168.xxx.xxx:/data/dpt .<br>dd if=dpt of=/dev/sda bs=1 count=64 seek=446  </p>
+<h3 id="GPT"><a href="#GPT" class="headerlink" title="GPT"></a>GPT</h3><p>支持128个分区<br>使用128位UUID(Universally Unique Identifier) 表示磁盘和分区 GPT分区表<br>自动备份在头和尾两份，并有CRC校验位<br>UEFI (统一扩展固件接口)硬件支持GPT  </p>
+<h2 id="分区工具"><a href="#分区工具" class="headerlink" title="分区工具"></a>分区工具</h2><h3 id="fdisk"><a href="#fdisk" class="headerlink" title="fdisk"></a>fdisk</h3><p>fdisk /dev/sdb 管理分区<br>fdisk -l [-u] [device…] 查看分区<br>子命令：  </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>p</strong></td>
+<td>分区列表</td>
+</tr>
+<tr>
+<td><strong>t</strong></td>
+<td>更改分区类型</td>
+</tr>
+<tr>
+<td><strong>n</strong></td>
+<td>创建新分区</td>
+</tr>
+<tr>
+<td><strong>d</strong></td>
+<td>删除分区</td>
+</tr>
+<tr>
+<td>v</td>
+<td>校验分区</td>
+</tr>
+<tr>
+<td>u</td>
+<td>转换单位 </td>
+</tr>
+<tr>
+<td><strong>w</strong></td>
+<td>保存并退出</td>
+</tr>
+<tr>
+<td>q</td>
+<td>不保存并退出</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>删除前面的分区，后面的分区会自动往前变更编号</p>
+</blockquote>
+<p><strong>查看内核是否已经识别新的分区</strong><br>lsblk<br>cat /proc/partations<br>fdisk -l /dev/sd*  </p>
+<blockquote>
+<p>centos7 同步分区表变化 partprobe<br>centos6 partprobe不起作用<br>partx -a 同步分布变化到内存<br>partx -d –nr x /dev/sd* X代表被删除的分区编号</p>
+</blockquote>
+<h3 id="parted"><a href="#parted" class="headerlink" title="parted"></a>parted</h3><p><strong>parted的操作都是实时生效的，小心使用</strong><br>parted /dev/sdb mklabel gpt|msdos<br>设置磁盘分区格式为GPT或者MBR<br>设置主分区1 默认的大小后缀为MB<br>parted /dev/sdb mkpart primary 1 200 （默认M）<br>删除分区<br>parted /dev/sdb rm 1</p>
+<h3 id="GPT-1"><a href="#GPT-1" class="headerlink" title="GPT"></a>GPT</h3><p>选项基本与fdisk相同  </p>
+<h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p>文件系统是操作系统用于明确存储设备或分区上的文件的方法和数据结构；即在存储设备上组织文件的方法。操作系统中负责管理和存储文件信息的软件结构称为文件管理系统，简称文件系统。  </p>
+<p>查看系统当前的文件系统：<br>cat /proc/filesystems</p>
+<blockquote>
+<p>日志系统修改优先于系统数据</p>
+</blockquote>
+<h3 id="创建文件系统"><a href="#创建文件系统" class="headerlink" title="创建文件系统"></a>创建文件系统</h3><table>
+<thead>
+<tr>
+<th>mkfs</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.ext4/.xfs /dev/sd*</td>
+<td>创建相应格式的文件系统</td>
+</tr>
+<tr>
+<td>-b {1024\</td>
+<td>2048\</td>
+<td>4096}</td>
+<td>指定块大小</td>
+</tr>
+<tr>
+<td>-L ‘LABEL’</td>
+<td>设置卷标</td>
+</tr>
+<tr>
+<td>-m</td>
+<td>默认5%,为管理人员预留空间占总空间的百分比</td>
+</tr>
+</tbody>
+</table>
+<p><strong>blkid</strong>: 块设备属性信息查看<br>-U UUID 根据指定的UUID来查找对应的设备   </p>
+<blockquote>
+<p>blkid -U <code>sed -nr &#39;s@^UUID=(.*) / .*@\1@p&#39; /etc/fstab</code>  </p>
+</blockquote>
+<p>-L LABEL 根据指定的LABEL来查找对应的设备  </p>
+<p><strong>e2lable</strong>: 设置ext系列的磁盘卷标  </p>
+<table>
+<thead>
+<tr>
+<th>tune2fs</th>
+<th>说明ext系列</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-l</td>
+<td>查看指定文件系统超级块信息</td>
+</tr>
+<tr>
+<td>-L ‘LABEL’</td>
+<td>修改卷标</td>
+</tr>
+<tr>
+<td>-m</td>
+<td>修预留给管理员的空间百分比 </td>
+</tr>
+<tr>
+<td>-o</td>
+<td>调整文件系统的默认挂载选项，–o ^acl</td>
+</tr>
+<tr>
+<td>-U UUID</td>
+<td>修改UUID号</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>在centos6之前的版本手动创建分区，是不带ACL选项的。自动创建的分区包括。   </p>
+</blockquote>
+<p><strong>dumpe2fs</strong> 查看块分组 -h查看超级块信息</p>
+<p><strong>文件系统检测修复</strong><br><strong>修复前要取消挂载</strong><br>fsck(ext4)<br>e2fsck<br>xfs_repair(xfs)</p>
+<h3 id="挂载"><a href="#挂载" class="headerlink" title="挂载"></a>挂载</h3><p><strong>mount</strong>  </p>
+<blockquote>
+<p>一个设备可以同时挂载到多个目录，目录必须事先存在<br>一个目录只可挂载一个设备，新挂载设备会断开之前的挂载关系，umount之后可以看到之前挂载的文件  </p>
+</blockquote>
+<p>挂载方法：mount DEVICE MOUNT_POINT<br>mount：通过查看/etc/mtab文件显示当前已挂载的所有设备<br>device：指明要挂载的设备；<br>(1) 设备文件：例如/dev/sda5<br>(2) 卷标：-L ‘LABEL’, 例如 -L ‘MYDATA’<br>(3) UUID, -U ‘UUID’：例如 -U  ‘0c50523c-43f1-45e7-85c0-a126711d406e’<br>(4) 伪文件系统名称：proc, sysfs, devtmpfs, configfs<br>dir：挂载点<br>事先存在；建议使用空目录<br>进程正在使用中的设备无法被卸载  </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-r</td>
+<td>readonly，只读挂载</td>
+</tr>
+<tr>
+<td>-w</td>
+<td>read and write, 读写挂载</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>不更新/etc/mtab，mount不可见</td>
+</tr>
+<tr>
+<td>-a</td>
+<td>自动挂载所有支持自动挂载的设备(定义在了/etc/fstab文件中，且挂载选项中有auto功能)</td>
+</tr>
+<tr>
+<td>-B, –bind</td>
+<td>绑定目录到另一个目录上</td>
+</tr>
+<tr>
+<td>-L ‘LABEL’</td>
+<td>以卷标指定挂载设备</td>
+</tr>
+<tr>
+<td>-U ‘UUID’</td>
+<td>以UUID指定要挂载的设备</td>
+</tr>
+<tr>
+<td><strong>-o</strong></td>
+<td><strong>挂载文件系统的选项，多个选项使用逗号分隔</strong></td>
+</tr>
+<tr>
+<td>async/sync</td>
+<td>异步模式/同步模式</td>
+</tr>
+<tr>
+<td>atime/noatime</td>
+<td>包含目录和文件 </td>
+</tr>
+<tr>
+<td>diratime/nodiratime</td>
+<td>目录的访问时间戳</td>
+</tr>
+<tr>
+<td>auto/noauto</td>
+<td>是否支持自动挂载,是否支持-a选项</td>
+</tr>
+<tr>
+<td>exec/noexec</td>
+<td>是否支持将文件系统上运行应用程序</td>
+</tr>
+<tr>
+<td>dev/nodev</td>
+<td>是否支持在此文件系统上使用设备文件</td>
+</tr>
+<tr>
+<td>suid/nosuid</td>
+<td>是否支持suid和sgid权限</td>
+</tr>
+<tr>
+<td>remount</td>
+<td>重新挂载</td>
+</tr>
+<tr>
+<td>ro</td>
+<td>只读</td>
+</tr>
+<tr>
+<td>rw</td>
+<td>读写</td>
+</tr>
+<tr>
+<td>user/nouser</td>
+<td>是否允许普通用户挂载此设备，/etc/fstab使用</td>
+</tr>
+<tr>
+<td>acl</td>
+<td>启用此文件系统上的acl功能</td>
+</tr>
+<tr>
+<td>loop</td>
+<td>losetup可管理 允许文件挂载到分区，创建的文件类似于USB设备，可以拷贝到任意机器挂载</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>defaults：相当于rw, suid, dev, exec, auto, nouser, async</p>
+</blockquote>
+<blockquote>
+<p>cat /proc/mounts 查看内核追踪到的已挂载的所有设备</p>
+</blockquote>
+<p><strong>卸载命令</strong><br>查看挂载情况<br>findmnt MOUNT_POINT|device   </p>
+<p>查看正在访问指定文件系统的进程<br>lsof MOUNT_POINT<br>fuser -v MOUNT_POINT  </p>
+<p>终止所有在正访问指定的文件系统的进程<br>fuser -km MOUNT_POINT  </p>
+<p>卸载<br>umount DEVICE<br>umount MOUNT_POINT  </p>
+<p><strong>挂载点和/etc/fstab</strong></p>
+<p>配置文件系统体系<br>被mount、fsck和其它程序使用<br>系统重启时保留文件系统体系<br>可以在设备栏使用文件系统卷标<br>使用mount -a 命令挂载/etc/fstab中的所有文件系统  </p>
+<blockquote>
+<p>cat /var/log/boot.log查看开机启动错误</p>
+</blockquote>
+<p><strong>交换空间swap</strong>  </p>
+<p>创建硬盘空间的需要单独修改分区类型t==82<br>mkswap 创建swap分区<br>需要写入/etc/fstab文件挂载swap分区<br><code>UUID=.....  swap  swap  defaults  0 0</code><br><strong>swapon -a</strong> 挂载分区<br><strong>swapon -s</strong> 查看分区挂载情况<br>swapoff 取消挂载swap分区<br>可以修改/etc/fstab文件修改swap分区的优先级<br>磁盘外圈的分区速度更快，可以考虑调高优先级<br><code>UUID=.....  swap  swap  pri=1  0 0</code><br>默认值为-1  </p>
+<blockquote>
+<p>优化性能：分布存放，高性能磁盘存放    </p>
+</blockquote>
+<p>案例1：<br>使用文件创建swap分区 </p>
+<ol>
+<li>dd if=/dev/zero of=/data/swapfile bs=2G count=1 创建需要大小的swap文件 </li>
+<li>mkswap /data/swapfile 格式化文件  </li>
+<li><code>/data/swapfile                              swap swap  defaults  0 0</code> 修改/etc/fstab文件  </li>
+<li>chmod 600 /data/swapfile  系统建议修改600权限 </li>
+<li>swapon -a挂载文件  </li>
+<li>如需迁移swap文件 需要先取消挂载swapoff </li>
+<li>修改/etc/fstab新的挂载点路径  </li>
+<li>swapon -a  </li>
+</ol>
+<p>如果不在需要swap文件和新增分区<br>先取消挂载swapoff<br>修改/etc/fstab文件<br>rm -rf /tmp/swapfile<br>fdisk /dev/sdd<br>最后删除文件和分区</p>
+<p>案例2：<br>迁移非独立分区到独立分区 </p>
+<ol>
+<li>fdisk /dev/sdc 创建新分区作为转移的目标  </li>
+<li>mkfs.xfs /dev/sdc1 创建文件系统  </li>
+<li>mkdir /mnt/home 新建目录作为挂载点  </li>
+<li>mount /dev/sdc1 /mnt/home/ 将新建分区挂载到新建目录中  </li>
+<li>cp -av /home/. /mnt/home/ 拷贝原目录所有内容到新的分区中  </li>
+<li>编辑/etc/fstab文件sdc1添加挂载点  <code>UUID=....  /home xfs  defaults 0 0</code></li>
+<li>mount -a 挂载分区 </li>
+</ol>
+<blockquote>
+<p>vim /etc/fstab时可使用r!blkid /dev/sd**来获取分区UUID以便挂载 </p>
+</blockquote>
+<p><strong>挂载移动设备</strong><br>光盘挂载  mount /dev/cdrom /mnt/<br>eject命令卸载或弹出磁盘<br>USB挂载 lsusb  </p>
+<p><strong>常见命令</strong><br>df -h 文件系统空间占用<br>du -sh 查看某目录总体空间<br>dd  </p>
+<table>
+<thead>
+<tr>
+<th>dd</th>
+<th>dd if=/PATH/FROM/SRC of=/PATH/TO/DESTe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>if=file</td>
+<td>从所命名文件读取而不是从标准输入</td>
+</tr>
+<tr>
+<td>of=file</td>
+<td>写到所命名的文件而不是到标准输出</td>
+</tr>
+<tr>
+<td>bs=size</td>
+<td>指定块大小 </td>
+</tr>
+<tr>
+<td>skip=blocks</td>
+<td>从开头忽略blocks个ibs大小的块 </td>
+</tr>
+<tr>
+<td>seek=blocks</td>
+<td>从开头忽略blocks个obs大小的块 </td>
+</tr>
+<tr>
+<td>count=n</td>
+<td>只拷贝n个记录 </td>
+</tr>
+<tr>
+<td><strong>conv=</strong></td>
+<td>用指定的参数转换文件</td>
+</tr>
+<tr>
+<td>lcase</td>
+<td>大写字符转换为小写字符</td>
+</tr>
+<tr>
+<td>ucase</td>
+<td>小写字符转换为大写字符</td>
+</tr>
+<tr>
+<td>nocreat</td>
+<td>不创建输出文件</td>
+</tr>
+<tr>
+<td>notrunc</td>
+<td>不截短输出文件 </td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>备份MBR dd if=/dev/sda of=/tmp/mbr.bak bs=512 count=1  </li>
+<li>备份硬盘空间 dd if=/dev/sdx of=/dev/sdy  </li>
+<li>备份/dev/sdx全盘数据，并利用gzip压缩，保存到指定路径 dd if=/dev/sdx | gzip &gt;/path/to/image.gz  </li>
+<li>将备份文件恢复到指定盘 dd if=/path/to/image of=/dev/sdx</li>
+<li>将压缩的备份文件恢复到指定盘 gzip -dc /path/to/image.gz | dd of=/dev/sdx</li>
+<li>销毁磁盘数据 dd if=/dev/urandom of=/dev/sda1</li>
+<li>测试硬盘写速度 dd if=/dev/zero of=/root/1Gb.file bs=1024 count=1000000</li>
+<li>测试硬盘读速度 dd if=/root/1Gb.file bs=64k | dd of=/dev/null </li>
+<li>修复硬盘 dd if=/dev/sda of=/dev/sda</li>
+</ul>
+<h3 id="RAID"><a href="#RAID" class="headerlink" title="RAID"></a>RAID</h3><p>mdadm 为软RAID提供管理界面<br>RAID设备可命名为/dev/md0、/dev/md1…</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mdadm -C</td>
+<td>创建</td>
+</tr>
+<tr>
+<td>-n #</td>
+<td>使用#个块设备来创建此RAID</td>
+</tr>
+<tr>
+<td>-l #</td>
+<td>指明要创建的RAID的级别</td>
+</tr>
+<tr>
+<td>-a {yes</td>
+<td>no}</td>
+<td>自动创建目标RAID设备的设备文件</td>
+</tr>
+<tr>
+<td>-c</td>
+<td>指明块大小,单位k </td>
+</tr>
+<tr>
+<td>-x</td>
+<td>指明空闲盘的个数 </td>
+</tr>
+<tr>
+<td>mdadm -D</td>
+<td>显示raid的详细信息</td>
+</tr>
+<tr>
+<td>-f</td>
+<td>标记指定磁盘为损坏 </td>
+</tr>
+<tr>
+<td>-a</td>
+<td>添加磁盘 </td>
+</tr>
+<tr>
+<td>-r</td>
+<td>移除磁盘 </td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>观察md的状态 cat /proc/mdstat</p>
+</blockquote>
+<p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">使用mdadm创建并定义RAID设备</span><br><span class="line">mdadm -C /dev/md0 -a yes -l 5 -n 3 -x 1 /dev/sd&#123;b,c,d,e&#125;1</span><br><span class="line">用文件系统对每个RAID设备进行格式化</span><br><span class="line">mkfs.xfs /dev/md0</span><br><span class="line">测试RAID设备</span><br><span class="line">使用mdadm检查RAID设备的状况</span><br><span class="line">mdadm --detail|D /dev/md0</span><br><span class="line">增加新的成员</span><br><span class="line">mdadm –G /dev/md0 –n4 -a /dev/sdf1</span><br></pre></td></tr></table></figure></p>
+<p><strong>软RAID管理</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">生成配置文件：mdadm –D –s &gt;&gt; /etc/mdadm.conf</span><br><span class="line">停止设备：mdadm –S /dev/md0</span><br><span class="line">激活设备：mdadm –A –s /dev/md0 激活</span><br><span class="line">强制启动：mdadm –R /dev/md0</span><br><span class="line">删除raid信息：mdadm --zero-superblock /dev/sdb1</span><br></pre></td></tr></table></figure></p>
+<h3 id="LVM逻辑卷管理器"><a href="#LVM逻辑卷管理器" class="headerlink" title="LVM逻辑卷管理器"></a>LVM逻辑卷管理器</h3><p>逻辑卷的创建过程 </p>
+<ol>
+<li>将设备指定为物理卷</li>
+<li>用一个或者多个物理卷来创建一个卷组</li>
+<li>物理卷是用固定大小的物理区域（Physical Extent，PE）来定义的</li>
+<li>在物理卷上创建的逻辑卷是由物理区域（PE）组成</li>
+<li>可以在逻辑卷上创建文件系统</li>
+</ol>
+<p><strong>pv物理卷管理工具</strong>  </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pvs、pvdisplay</td>
+<td>显示pv信息</td>
+</tr>
+<tr>
+<td>pvcreate /dev/DEVICE</td>
+<td>创建pv</td>
+</tr>
+<tr>
+<td>pvremove /dev/DEVICE</td>
+<td>删除pv  </td>
+</tr>
+</tbody>
+</table>
+<p><strong>vg卷组管理工具</strong>  </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vgs、vgdisplay</td>
+<td>显示卷组信息</td>
+</tr>
+<tr>
+<td>vgcreate VolumeGroupName PhysicalDevicePath</td>
+<td>创建卷组</td>
+</tr>
+<tr>
+<td>vgextend、vgreduce VolumeGroupName PhysicalDevicePath</td>
+<td>管理卷组</td>
+</tr>
+<tr>
+<td>先做pvmove，再做vgremove</td>
+<td>删除卷组 </td>
+</tr>
+</tbody>
+</table>
+<p><strong>lv管理工具</strong> </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lvs、Lvdisplay</td>
+<td>显示逻辑卷</td>
+</tr>
+<tr>
+<td>lvcreate -l 60%VG/100%FREE -n NAME VolumeGroup</td>
+<td>创建逻辑卷</td>
+</tr>
+<tr>
+<td>lvremove /dev/VG_NAME/LV_NAME</td>
+<td>删除逻辑卷</td>
+</tr>
+<tr>
+<td>fsadm、resize2fs、xfs_growfs</td>
+<td>重设文件系统大小</td>
+</tr>
+</tbody>
+</table>
+<p><strong>扩展和缩减逻辑卷</strong><br>扩展逻辑卷：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lvextend -L [+]#[mMgGtT] /dev/VG_NAME/LV_NAME</span><br><span class="line">resize2fs /dev/VG_NAME/LV_NAME</span><br><span class="line">lvresize -r -l +100%FREE /dev/VG_NAME/LV_NAME</span><br></pre></td></tr></table></figure></p>
+<p>缩减逻辑卷：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">umount /dev/VG_NAME/LV_NAME</span><br><span class="line">e2fsck -f /dev/VG_NAME/LV_NAME</span><br><span class="line">resize2fs /dev/VG_NAME/LV_NAME #[mMgGtT]</span><br><span class="line">lvreduce -L [-]#[mMgGtT] /dev/VG_NAME/LV_NAME</span><br><span class="line">mount</span><br></pre></td></tr></table></figure></p>
+<p>创建逻辑卷示例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">创建物理卷</span><br><span class="line">pvcreate /dev/sda3</span><br><span class="line">为卷组分配物理卷</span><br><span class="line">vgcreate vg0 /dev/sda3</span><br><span class="line">从卷组创建逻辑卷</span><br><span class="line">lvcreate -L 256M -n data vg0</span><br><span class="line">mkfs.xfs -j /dev/vg0/data</span><br><span class="line">挂载</span><br><span class="line">mount /dev/vg0/data /mnt/data</span><br></pre></td></tr></table></figure></p>
+<p>跨主机迁移卷组<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">源计算机上</span><br><span class="line">1 在旧系统中，umount所有卷组上的逻辑卷</span><br><span class="line">2 禁用卷组</span><br><span class="line">vgchange –a n vg0</span><br><span class="line">lvdisplay</span><br><span class="line">3 导出卷组</span><br><span class="line">vgexport vg0</span><br><span class="line">pvscan</span><br><span class="line">vgdisplay</span><br><span class="line">拆下旧硬盘</span><br><span class="line">在目标计算机上</span><br><span class="line">4 在新系统中安装旧硬盘，并导入卷组：vgimport vg0</span><br><span class="line">5 vgchange –ay vg0 启用</span><br><span class="line">6 mount所有卷组上的逻辑卷</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>XFS可以扩展，不能缩减<br><strong>lvextend -r 不考虑文件系统格式直接扩展容量</strong><br>centos7 xfs文件系统<br>mount -o nouuid，ro挂载快照需要特殊选项 不检查uuid  只读 </p>
+</blockquote>
+<p>快照可临时用于备份，不影响用户的写入操作  </p>
+<p><strong>快照用完谨记用后删除</strong>，会影响服务器性能  </p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/14/Shell脚本/" rel="next" title="shell脚本">
+                <i class="fa fa-chevron-left"></i> shell脚本
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">nieW</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#磁盘系统"><span class="nav-number">1.</span> <span class="nav-text">磁盘系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设备文件"><span class="nav-number">1.1.</span> <span class="nav-text">设备文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MBR："><span class="nav-number">1.1.1.</span> <span class="nav-text">MBR：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPT"><span class="nav-number">1.1.2.</span> <span class="nav-text">GPT</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分区工具"><span class="nav-number">1.2.</span> <span class="nav-text">分区工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fdisk"><span class="nav-number">1.2.1.</span> <span class="nav-text">fdisk</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parted"><span class="nav-number">1.2.2.</span> <span class="nav-text">parted</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPT-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">GPT</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件系统"><span class="nav-number">1.3.</span> <span class="nav-text">文件系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建文件系统"><span class="nav-number">1.3.1.</span> <span class="nav-text">创建文件系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#挂载"><span class="nav-number">1.3.2.</span> <span class="nav-text">挂载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RAID"><span class="nav-number">1.3.3.</span> <span class="nav-text">RAID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LVM逻辑卷管理器"><span class="nav-number">1.3.4.</span> <span class="nav-text">LVM逻辑卷管理器</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nieW</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
