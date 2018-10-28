@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="OSI网络模型物理层二进制传输 数据链路层frame 帧  通过MAC物理地址定义发送位置访问介质支持检查错误定义如何格式化数据以便传输以及如何控制对网络的访问 网络层package包路由数据传输支持逻辑寻址的路径选择    传输层错误检测和恢复传输问题端对端的通信确保数据可靠性传输  会话层session主机间通信   表示层数据表示加密、解密、压缩   应用层网络进程访问提供身份验证 网络传输">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络协议和管理">
+<meta property="og:url" content="http://blog.nextx.tk/2018/10/28/网络协议和管理/index.html">
+<meta property="og:site_name" content="nieW learn">
+<meta property="og:description" content="OSI网络模型物理层二进制传输 数据链路层frame 帧  通过MAC物理地址定义发送位置访问介质支持检查错误定义如何格式化数据以便传输以及如何控制对网络的访问 网络层package包路由数据传输支持逻辑寻址的路径选择    传输层错误检测和恢复传输问题端对端的通信确保数据可靠性传输  会话层session主机间通信   表示层数据表示加密、解密、压缩   应用层网络进程访问提供身份验证 网络传输">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.grabsun.com/uploads/images/2015/54/wKiom1QGdPbQJBUpAAGiZLsJq8c657.jpg">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/C98B24137A85443F85B85C8E4D0A5B91?method=download&shareKey=c79988dbf88615a0b818e7a9adb1ae2a">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/26E98CC0545546368474ABC4ACC700D0?method=download&shareKey=5e6b697061327a0b9584ddbcc9998cf2">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/C7F0820C92BE496D93ED7DD829DE5629?method=download&shareKey=413ca19909998fc8fb5534227e402fff">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/751046B9A0C44C5585097D9766427203?method=download&shareKey=23f0d6cac7eb8215d4623811c2a60b7b">
+<meta property="og:image" content="http://images2015.cnblogs.com/blog/824490/201512/824490-20151209134608480-1590076700.jpg">
+<meta property="og:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1540282372463&di=8fb0519b421c63b4ce81ab64bbfbbac8&imgtype=0&src=http%3A%2F%2Fimage.bubuko.com%2Finfo%2F201801%2F20180123121700226188.png">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/45B68B56034A4A8E9D133A38F4B32B63?method=download&shareKey=3ae635e5b2dc52f4723a3c7d32082f99">
+<meta property="og:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1540409996992&di=7e2f12e9420a3a55843a4ac6eab769ce&imgtype=0&src=http%3A%2F%2Fseo-1255598498.file.myqcloud.com%2Ffull%2F47306c0a3fc889b5767e970986fd6b46800713f8.jpg">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/639EE0E5B91549F4A999B4B0AA6149D4?method=download&shareKey=9d44b3051fb4f945892e076d0a41db6a">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/9E69606415354B20A85637D1B867F387?method=download&shareKey=4a3efb0944976678740a20d9ffcafd0c">
+<meta property="og:updated_time" content="2018-10-28T05:48:01.222Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="网络协议和管理">
+<meta name="twitter:description" content="OSI网络模型物理层二进制传输 数据链路层frame 帧  通过MAC物理地址定义发送位置访问介质支持检查错误定义如何格式化数据以便传输以及如何控制对网络的访问 网络层package包路由数据传输支持逻辑寻址的路径选择    传输层错误检测和恢复传输问题端对端的通信确保数据可靠性传输  会话层session主机间通信   表示层数据表示加密、解密、压缩   应用层网络进程访问提供身份验证 网络传输">
+<meta name="twitter:image" content="http://www.grabsun.com/uploads/images/2015/54/wKiom1QGdPbQJBUpAAGiZLsJq8c657.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.nextx.tk/2018/10/28/网络协议和管理/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>网络协议和管理 | nieW learn</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nieW learn</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.nextx.tk/2018/10/28/网络协议和管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nieW">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nieW learn">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">网络协议和管理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-28 13:47:05 / 修改时间：13:48:01" itemprop="dateCreated datePublished" datetime="2018-10-28T13:47:05+08:00">2018-10-28</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="OSI网络模型"><a href="#OSI网络模型" class="headerlink" title="OSI网络模型"></a>OSI网络模型</h1><h2 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h2><p>二进制传输</p>
+<h2 id="数据链路层"><a href="#数据链路层" class="headerlink" title="数据链路层"></a>数据链路层</h2><p>frame 帧  通过MAC物理地址定义发送位置<br>访问介质<br>支持检查错误<br>定义如何格式化数据以便传输以及如何控制对网络的访问</p>
+<h2 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h2><p>package包<br>路由数据传输<br>支持逻辑寻址的路径选择   </p>
+<h2 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h2><p>错误检测和恢复<br>传输问题<br>端对端的通信<br>确保数据可靠性传输 </p>
+<h2 id="会话层"><a href="#会话层" class="headerlink" title="会话层"></a>会话层</h2><p>session<br>主机间通信  </p>
+<h2 id="表示层"><a href="#表示层" class="headerlink" title="表示层"></a>表示层</h2><p>数据表示<br>加密、解密、压缩  </p>
+<h2 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h2><p>网络进程访问<br>提供身份验证<br><img src="http://www.grabsun.com/uploads/images/2015/54/wKiom1QGdPbQJBUpAAGiZLsJq8c657.jpg" alt="OSI"></p>
+<h3 id="网络传输协议"><a href="#网络传输协议" class="headerlink" title="网络传输协议"></a>网络传输协议</h3><blockquote>
+<p>七层网络协议特点<br>all people seem to need process data<br>下层协议要为上层协议服务<br>下层有上层的标记位  </p>
+</blockquote>
+<h3 id="pdu"><a href="#pdu" class="headerlink" title="pdu"></a>pdu</h3><p>PDU: Protocol Data Unit,协议数据单元是指对等层次之间传递的数据单位  </p>
+<ul>
+<li>单播 目标明确 为一个设备</li>
+<li>广播 目标不明确 为多个设备 范围明确</li>
+<li>组播 目标为一部分设备 范围明确  </li>
+</ul>
+<p>lan  基于广播机制通讯<br>wan  基于点对点机制通讯  </p>
+<p>基带  数字信号<br>宽带  模拟信号 </p>
+<p>双绞线有利于避免电磁干扰<br>光纤不受电磁干扰  </p>
+<p>100MB 用到 1白橙 2橙 3白绿 6绿   12发送数据 36接收数据<br>1000MB会用到8根线  </p>
+<p>单工  单向传输 100MB传输   喇叭  电视<br>半双工  同一时间只能单向传输  对讲机<br>全双工  同时双向传输  电话</p>
+<blockquote>
+<p>tcpdump linux抓包工具<br>wireshark  windows抓包工具 抓获60-1514位 </p>
+</blockquote>
+<p><img src="https://note.youdao.com/yws/api/personal/file/C98B24137A85443F85B85C8E4D0A5B91?method=download&amp;shareKey=c79988dbf88615a0b818e7a9adb1ae2a" alt="frame"><br><img src="https://note.youdao.com/yws/api/personal/file/26E98CC0545546368474ABC4ACC700D0?method=download&amp;shareKey=5e6b697061327a0b9584ddbcc9998cf2" alt="frame"></p>
+<p>交换机MAC表不记录广播地址<br>交换机不能阻断广播域  </p>
+<p>路由器分隔广播域  多播、广播都不能通过<br>网卡工作在数据链路层  </p>
+<h3 id="vlan"><a href="#vlan" class="headerlink" title="vlan"></a>vlan</h3><p>分隔广播域、安全、灵活管理<br>管理vlan还需要路由器，带路由功能的三层交换机也可管理</p>
+<p>trunk 802.1q 干道路由协议  多vlan通讯协议<br>在通过trunk时添加vlan标识信息，以便其余交换机识别特定vlan通讯  </p>
+<p>为避免广播风暴出现回环   可以使用stp生成树协议  </p>
+<h2 id="TCP-IP协议栈"><a href="#TCP-IP协议栈" class="headerlink" title="TCP/IP协议栈"></a>TCP/IP协议栈</h2><p>网络访问层–Internet层–传输层–应用层<br><img src="https://note.youdao.com/yws/api/personal/file/C7F0820C92BE496D93ED7DD829DE5629?method=download&amp;shareKey=413ca19909998fc8fb5534227e402fff" alt="TCP/IP"></p>
+<h3 id="TCP-UDP"><a href="#TCP-UDP" class="headerlink" title="TCP/UDP"></a>TCP/UDP</h3><table>
+<thead>
+<tr>
+<th>TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>面向对象</td>
+<td>非面向对象</td>
+</tr>
+<tr>
+<td>次序性</td>
+<td>非次序性 </td>
+</tr>
+<tr>
+<td>邮件、下载、共享文件</td>
+<td>视频、语音 </td>
+</tr>
+</tbody>
+</table>
+<p><strong>TCP包头</strong>  标准20字节<br><img src="https://note.youdao.com/yws/api/personal/file/751046B9A0C44C5585097D9766427203?method=download&amp;shareKey=23f0d6cac7eb8215d4623811c2a60b7b" alt="TCP包头"></p>
+<p>端口号区分上层协议的唯一标示<br>服务器端协议端口固定，便于客户端申请访问  </p>
+<table>
+<thead>
+<tr>
+<th>TCP端口</th>
+<th>服务</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>21</td>
+<td>FTP 文件传输协议</td>
+</tr>
+<tr>
+<td>22</td>
+<td>SSH 安全登录、文件传送(SCP)和端口重定向</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Telnet 不安全的文本传送</td>
+</tr>
+<tr>
+<td>69</td>
+<td>SMTP Simple Mail Transfer Protocol (E-mail)</td>
+</tr>
+<tr>
+<td>79</td>
+<td>finger Finger</td>
+</tr>
+<tr>
+<td>80</td>
+<td>HTTP 超文本传送协议 (WWW)</td>
+</tr>
+<tr>
+<td>88</td>
+<td>Kerberos Authenticating agent</td>
+</tr>
+<tr>
+<td>110</td>
+<td>POP3 Post Office Protocol (E-mail)</td>
+</tr>
+<tr>
+<td>443</td>
+<td>HTTPS used for securely transferring web pages </td>
+</tr>
+<tr>
+<td>smb</td>
+<td>445</td>
+</tr>
+<tr>
+<td>3306</td>
+<td>mysql</td>
+</tr>
+<tr>
+<td>1521</td>
+<td>oracle</td>
+</tr>
+<tr>
+<td>1433</td>
+<td>sql server </td>
+</tr>
+</tbody>
+</table>
+<h4 id="TCP三次握手"><a href="#TCP三次握手" class="headerlink" title="TCP三次握手"></a>TCP三次握手</h4><p><img src="http://images2015.cnblogs.com/blog/824490/201512/824490-20151209134608480-1590076700.jpg" alt="TCP三次握手"><br><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1540282372463&amp;di=8fb0519b421c63b4ce81ab64bbfbbac8&amp;imgtype=0&amp;src=http%3A%2F%2Fimage.bubuko.com%2Finfo%2F201801%2F20180123121700226188.png" alt="TCP四次挥手"></p>
+<p>ack确认号比第一次序列号+1<br>ACK三次握手确认数   </p>
+<p><strong>窗口大小</strong>=Window size value * Window size scaling factor  </p>
+<blockquote>
+<p>窗口值Window size value是可变的，取决于当前负载情况协商而定  </p>
+</blockquote>
+<p>抓取网络链接状态种类<br>ss -nt |sed -rn ‘1!s/^([^ ]+).*/\1/p’ |sort |uniq -c</p>
+<blockquote>
+<p>cat /etc/services查看系统常见协议端口号<br>cat /proc/sys/net/ipv4/ip_local_port_range 查看客户端端口范围<br>cat /proc/sys/net/ipv4/tcp_max_syn_backlog  查看半连接队列数值<br>cat /proc/sys/net/core/somaxconn 查看全连接队列数量<br>cat /proc/sys/net/ipv4/tcp_max_orphans 内核能接管的孤儿连接数目<br>cat /proc/sys/net/ipv4/tcp_fin_timeout 孤儿连接在内核中生存的时间<br>/proc/sys/net/ipv4/tcp_congestion_control  当前所使用的拥塞控制算法   </p>
+</blockquote>
+<h4 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h4><p>无状态、不可靠的网络访问、传输性能高 </p>
+<h4 id="Internet层"><a href="#Internet层" class="headerlink" title="Internet层"></a>Internet层</h4><h5 id="ICMP"><a href="#ICMP" class="headerlink" title="ICMP"></a>ICMP</h5><p>Internet Control Message Protocol  </p>
+<p>ICMP基于Internet层<br>type8 请求报文  type0 响应报文  </p>
+<p>ddos 分布式拒绝访问攻击<br>ping -s 65507 -f IP  -f尽最大能力ping -s指定包大小   </p>
+<blockquote>
+<p>cat /proc/sys/net/ipv4/icmp_echo_ignore_all<br>是否忽略icmp响应 0不忽略 1忽略   </p>
+</blockquote>
+<h5 id="ARP"><a href="#ARP" class="headerlink" title="ARP"></a>ARP</h5><p>地址解析协议<br>Address Resolution Protocol</p>
+<p>ARP通过广播询问<br>开机状态时 系统会通过ARP广播确认IP地址是否冲突 </p>
+<p><strong>源主机必须配置网关地址</strong><br>跨路由的ARP广播通过写临近的网关接口MAC地址，逐层查找目标主机<br>IP不变 MAC地址每跨一次路由都变更为网关口，直到找打目标主机MAC  </p>
+<p><img src="https://note.youdao.com/yws/api/personal/file/45B68B56034A4A8E9D133A38F4B32B63?method=download&amp;shareKey=3ae635e5b2dc52f4723a3c7d32082f99" alt="ARP广播"></p>
+<blockquote>
+<p>ARP没有校验功能 APR攻击 网关造假<br>手工绑定主机MAC和网关MAC可以避免APR欺骗</p>
+</blockquote>
+<h5 id="IP"><a href="#IP" class="headerlink" title="IP"></a>IP</h5><p>运行于 OSI 网络层<br>面向无连接的协议<br>独立处理数据包<br>分层编址<br>尽力而为传输<br>无数据恢复功能  </p>
+<p>IP PDU报头<br>最少20字节<br>IPV4地址长度2^32<br><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1540409996992&amp;di=7e2f12e9420a3a55843a4ac6eab769ce&amp;imgtype=0&amp;src=http%3A%2F%2Fseo-1255598498.file.myqcloud.com%2Ffull%2F47306c0a3fc889b5767e970986fd6b46800713f8.jpg" alt="IP"></p>
+<p>IP PDU报头  每次数据MTU不足1500，需切片传送<br><img src="https://note.youdao.com/yws/api/personal/file/639EE0E5B91549F4A999B4B0AA6149D4?method=download&amp;shareKey=9d44b3051fb4f945892e076d0a41db6a" alt="IP"></p>
+<blockquote>
+<p>cat /proc/sys/net/ipv4/ip_default_ttl<br>TTL生命期查看  可以经过的路由器数量<br>cat /etc/protocols 查看系统默认协议类型 </p>
+</blockquote>
+<p>访问网站的步骤需了解  </p>
+<blockquote>
+<p>可以将IP地址转换成10进制，也可以ping通<br>127开头的lo回环地址都可以ping通  </p>
+</blockquote>
+<p><strong>IP地址分类</strong>：</p>
+<p>A类地址：1-126.X.Y.Z   1600万个数<br>0xxxxxxx.X.Y.Z <strong>前一位不可变</strong><br>00000000  0<br>01111111 127<br>网络ID位为高8位，主机ID位为24<br>主机ID数：2^24-2=1600万<br>网络ID位：2^7-2=126  </p>
+<p>B类地址：128-191.X.Y.Z<br>10xxxxxx.X.Y.Z <strong>前两位不可变</strong><br>10000000  128<br>10111111  191<br>网络ID位为高16位，主机ID位为16<br>主机ID数：2^16-2=65534<br>网络ID位：2^14-2=16382   </p>
+<p>C类地址：192-223.X.Y.Z<br>110xxxxx.X.Y.Z <strong>前三位不可变</strong><br>11000000  192<br>11011111  223<br>网络ID位为高24位，主机ID位为8<br>主机ID数：2^8-2=254<br>网络ID位：2^21-2=2097150  </p>
+<p>D类地址：多播地址 110xxxx.X.Y.Z<br>E类地址：11110xxx.X.Y.Z</p>
+<blockquote>
+<p>公式：<br>1、一个网络中主机位最大=2\^主机ID数-2=2^(32-网络ID位数)-2<br>2、网络ID数(网段)=2\^可变网络ID位<br>3、CIDR表示法：IP/网络ID位数<br>4、网络ID值=IP与子网掩码运算,其余位写0  0与1=0 0与0=0 1与0=0 1与1=1<br>5、划分子网：一个大网划成多个小网，网络ID位变多，主机ID位才变小，网络ID向主机ID借位N，分成2^N个小网 2^N&gt;=划分子网数<br>6、合并超网：多个小网合并成一个大网，主机ID向网络ID借位</p>
+</blockquote>
+<p>无类域间路由CIDR：网络ID位数不确定<br>netmask子网掩码：32bit二进制，<strong>高位对应于网络ID位为1，地位对应于主机ID位为0</strong>   </p>
+<p><strong>可能的子网掩码表现形式</strong>  </p>
+<table>
+<thead>
+<tr>
+<th>二进制</th>
+<th>十进制</th>
+<th>子网掩码</th>
+<th>主机ID位数(32位中0的个数)</th>
+<th>网络ID位数(32位中1的个数)</th>
+<th>CIDR表示法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00000000</td>
+<td>0</td>
+<td>255.255.0.0</td>
+<td>2^(8+8)-2=65534</td>
+<td>32-16=16</td>
+<td>IP/16</td>
+</tr>
+<tr>
+<td>10000000</td>
+<td>128</td>
+<td>255.255.128.0</td>
+<td>2^(7+8)-2=32766</td>
+<td>32-15=17</td>
+<td>IP/17</td>
+</tr>
+<tr>
+<td>11000000</td>
+<td>192</td>
+<td>255.255.192.0</td>
+<td>2^(6+8)-2=16382</td>
+<td>32-14=18</td>
+<td>IP/18</td>
+</tr>
+<tr>
+<td>11100000</td>
+<td>224</td>
+<td>255.255.224.0</td>
+<td>2^(5+8)-2=8190</td>
+<td>32-13=19</td>
+<td>IP/19</td>
+</tr>
+<tr>
+<td>11110000</td>
+<td>240</td>
+<td>255.255.240.0</td>
+<td>2^(4+8)-2=4094</td>
+<td>32-12=20</td>
+<td>IP/20</td>
+</tr>
+<tr>
+<td>11111000</td>
+<td>248</td>
+<td>255.255.248.0</td>
+<td>2^(3+8)-2=2046</td>
+<td>32-11=21</td>
+<td>IP/21</td>
+</tr>
+<tr>
+<td>11111100</td>
+<td>252</td>
+<td>255.255.252.0</td>
+<td>2^(2+8)-2=1022</td>
+<td>32-10=22</td>
+<td>IP/22</td>
+</tr>
+<tr>
+<td>11111110</td>
+<td>254</td>
+<td>255.255.254.0</td>
+<td>2^(1+8)-2=510</td>
+<td>32-9=23</td>
+<td>IP/23</td>
+</tr>
+<tr>
+<td>11111111</td>
+<td>255</td>
+<td>255.255.255.0</td>
+<td>2^(0+8)-2=254</td>
+<td>32-8=24</td>
+<td>IP/24</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>判断两个IP是不是同一网段看网络ID，IP地址与子网掩码与运算确定<br>注意判断的方式：使用自己的子网掩码与自己和对方IP地址进行与运算，得到的结果才可以判断自己是否与对方在同一网络<br>例如：A与B互相访问需用自己的掩码与对方与运算<br>A 172.18.0.100 255.0.0.0  172.18.0.0/16<br>B 172.18.0.123 255.255.255.0 172.18.0.0/24<br>子网掩码和IP的与运算结果与网关处在同一网段即可通讯</p>
+</blockquote>
+<p><strong>计算网段中最小IP和最大IP的方法</strong>：<br>首先需要计算出网络ID值也就是网段的值。</p>
+<p>例如100.123.192.0/20  </p>
+<ol>
+<li>将IP和子网掩码转换成二进制 255.255.248.0<br>01100100.01111011.11000000.00000000<br>11111111.11111111.11110000.00000000   </li>
+<li>由于前20位的网络ID位不可变，所以取到前20位的二进制数固定不变<br>100.123.1100 0000.00000000   </li>
+<li>最小IP地址的表示形式可以是(在可变位数的范围内最小值，但不可以是预留地址)<br>二进制为 100.123.1100 0000.00000001<br>十进制为 100.123.192.1   </li>
+<li>最大IP地址的表示形式可以是(在可变位数的范围内最大值，但不可以是广播地址)<br>二进制为 100.123.1100 1111.11111110<br>十进制为 100.123.207.254   </li>
+</ol>
+<p><strong>划分子网方法</strong>：<br>例如：<br>10.0.0.0/8划分成两个网络的话，网络位向主机位借一位，可变位为一个，有两种可能性。<br>10.0 0000000.0.0 10.0.0.0/9<br>10.1 0000000.0.0 10.128.0.0/9   </p>
+<p>10.0.0.0/8划分成四个网络的话，网络位向主机位借两位，可变位为两个个，有四种可能性。<br>10.00 000000.0.0 10.0.0.0/10<br>10.01 000000.0.0 10.64.0.0/10<br>10.10 000000.0.0 10.128.0.0/10<br>10.11 000000.0.0 10.192.0.0/10   </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">10.0.0.0/8 给32省份划分各自子网  </span><br><span class="line">借5位  </span><br><span class="line">1. 子网子网掩码  255.248.0.0 </span><br><span class="line">2. 最小子网，最大子网的网络ID  </span><br><span class="line">10.00000  000.0.0  10.0.0.0/13  </span><br><span class="line">10.11111  000.0.0  10.248.0.0/13</span><br><span class="line">3. 每个子网主机数？2^19-2</span><br><span class="line">4. 第20个子网分给河南使用，最小IP10.152.0.1，最大IP范围10.159.255.254</span><br><span class="line">&gt; 计算第20个子网，就是推算出从0到第19的二进制数即为第20个子网。  </span><br><span class="line">10.10011  000.0.1      </span><br><span class="line">10.10011  111.255.254</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">河南省10.152.0.0/13 给87个区县，划分各自子网 </span><br><span class="line">借7位  </span><br><span class="line">1 子网子网掩码  255.255.240.0</span><br><span class="line">2 最小子网，最大子网的网络ID</span><br><span class="line">10.10011 000.0000 0000.0 10.152.0.0/20</span><br><span class="line">10.10011 111.1111 0000.0 10.159.240.0/20</span><br><span class="line">3 每个子网主机数？ 2^12-2=4094</span><br><span class="line">4 最大子网的最小IP，最大IP范围</span><br><span class="line">10.10011 111.1111 0000.1  10.159.240.1/20</span><br><span class="line">10.10011 111.1111 1111.254 10.159.255.254/20</span><br></pre></td></tr></table></figure>
+<p><strong>超网合并</strong><br>寻找多个路由网段的相同点合并，不同点作为新的主机ID位<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">220.78.168.0   220.78.10101 000.0</span><br><span class="line">220.78.169.0   220.78.10101 001.0</span><br><span class="line">|         |    |              |</span><br><span class="line">220.78.175.0   220.78.10101 111.0</span><br><span class="line">第三个网段的前五位相同，这样就可以作为新的网络主机位，后8位作为新的主机位。</span><br><span class="line">得到结果为：</span><br><span class="line">220.78.168.0/21</span><br></pre></td></tr></table></figure></p>
+<p>常用二进制数字<br>00000001 1<br>00000010 2<br>00000100 4<br>00001000 8<br>00010000 16<br>00100000 32<br>01000000 64<br>10000000 128  </p>
+<h5 id="常见IP地址"><a href="#常见IP地址" class="headerlink" title="常见IP地址"></a>常见IP地址</h5><table>
+<thead>
+<tr>
+<th>类</th>
+<th>公有IP地址范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>1.0.0.0–9.255.255.255 11.0.0.0–126.255.255.255</td>
+</tr>
+<tr>
+<td>B</td>
+<td>128.0.0.0–172.15.255.255 172.32.0.0–191.255.255.255</td>
+</tr>
+<tr>
+<td>C</td>
+<td>192.0.0.0–192.167.255.255 192.169.0.0–223.255.255.255</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>类</th>
+<th>私有地址范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>10.0.0.0 到10.255.255.255</td>
+</tr>
+<tr>
+<td>B</td>
+<td>172.16.0.0 到172.31.255.255</td>
+</tr>
+<tr>
+<td>C</td>
+<td>192.168.0.0 到192.168.255.255</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>0.0.0.0 不是一个真正意义上的IP地址。它表示所有不清楚的主机和目的网络。<br>255.255.255.255 限制广播地址。对本机来说，这个地址指本网段内(同一广播域)的所有主机。<br>127.0.0.1～127.255.255.254 本机回环地址，主要用于测试。在传输介质上永远不应该出现目的地址为“127.0.0.1”的数据包。<br>224.0.0.0到239.255.255.255 组播地址，224.0.0.1特指所有主机，224.0.0.2特指所有路由器。224.0.0.5指OSPF 路由器，地址多用于一些特定的程序以及多媒体程序。<br>169.254.x.x 如果Windows主机使用了DHCP自动分配IP地址，而又无法从DHCP服务器获取地址，系统会为主机分配这样地址。   </p>
+</blockquote>
+<h3 id="路由表"><a href="#路由表" class="headerlink" title="路由表"></a>路由表</h3><p>linux查看路由表 route -n<br>路由分类：主机路由 网络路由 默认路由<br>优先级：精度越高，优先级越高   </p>
+<p><strong>目标网络ID</strong>：目标IP所在网络ID<br><strong>接口</strong>：本设备要发送数据包到目标，从本设备哪个接口发送出来，才能到达<br><strong>网关</strong>：到达目标网络，需要将数据交给下一个路由哪个接口的对应IP  </p>
+<p>路由器单向接收，只负责将数据交给下一个路由。<br><strong>主机路由</strong>：精确描述路由到一个主机的路径<br><strong>网络路由</strong>：描述网段路由信息<br><strong>默认路由</strong>：0.0.0.0/0，边界路由，单个出口。 不描述到特定网段的路由。<strong>由配置默认网关生产</strong> </p>
+<p>企业内部：可以在边界路由增加一条默认路由，接口指向出口IP，网关填写下一跳运营商接口。</p>
+<p><img src="https://note.youdao.com/yws/api/personal/file/9E69606415354B20A85637D1B867F387?method=download&amp;shareKey=4a3efb0944976678740a20d9ffcafd0c" alt="router"></p>
+<h3 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h3><p><strong>Centos7采用传统命名方式</strong>  </p>
+<ol>
+<li>编辑/etc/default/grub配置文件<br>GRUB_CMDLINE_LINUX=”rhgb quiet net.ifnames=0”</li>
+<li>为grub2生成其配置文件grub2-mkconfig -o /etc/grub2.cfg </li>
+<li>重启系统</li>
+</ol>
+<p>DHCP通过UDP通讯<br>服务器端：67  客户端：68</p>
+<p>hosts文件 /etc/hosts<br><strong>修改系统解析优先级</strong>:/etc/nsswitch.conf<br><strong>DNS解析</strong>：/etc/resolv.conf<br>getent hosts  查看/etc/hosts 内容 </p>
+<blockquote>
+<p>QQ内置了腾讯服务器IP，不依赖DNS解析  </p>
+</blockquote>
+<ul>
+<li>centos6 主机名 配置文件：/etc/sysconfig/network<br>exec bash可以不重启更换主机名  </li>
+<li>centos7 主机名 /etc/hostname<br>hostnamectl set-hostname ……<br>exec bash   </li>
+</ul>
+<blockquote>
+<p>更改主机名后建议修改/etc/hosts 添加到127.0.0.1行尾   </p>
+</blockquote>
+<p>避免问题可以将网站外网IP和域名  写到hosts文件中  </p>
+<p>centos6修改网卡名称：/etc/udev/rules.d/70-persistent-net.rules<br>ethtool -i eth*  查看指定网卡的硬件信息<br>dmesg |grep –i eth  查看指定网卡的硬件信息<br>lsmod 查看系统加载的模块<br>modprobe -r e1000  卸载相应网卡的驱动文件<br>rmmod e1000 卸载相应网卡的驱动文件  </p>
+<h4 id="网络配置文件"><a href="#网络配置文件" class="headerlink" title="网络配置文件"></a>网络配置文件</h4><p>IP、MASK、GW、DNS相关配置文件：/etc/sysconfig/networkscripts/ifcfg-IFACE  </p>
+<blockquote>
+<p>BOOTPROTO：激活此设备时使用的地址配置协议，常用的dhcp, static,<br>none, bootp<br>ONBOOT：在系统引导时是否激活此设备<br>IPADDR：指明IP地址<br>NETMASK：子网掩码<br>PREFIX：CIDR掩码写法<br>GATEWAY: 默认网关</p>
+</blockquote>
+<p>示例：<br>DHCP方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DEVICE=ethX</span><br><span class="line">HWADDR=0:02:8A:A6:30:45</span><br><span class="line">BOOTPROTO=dhcp</span><br><span class="line">ONBOOT=yes</span><br><span class="line">Type=Ethernet</span><br></pre></td></tr></table></figure></p>
+<p>静态方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DEVICE=ethX</span><br><span class="line">HWADDR=0:02:8A:A6:30:45</span><br><span class="line">IPADDR=192.168.0.123</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">GATEWAY=192.168.0.254</span><br><span class="line">ONBOOT=yes</span><br><span class="line">Type=Ethernet</span><br></pre></td></tr></table></figure></p>
+<p>新格式方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(1) TARGET via GW</span><br><span class="line">如：10.0.0.0/8 via 172.16.0.1</span><br><span class="line">(2) 每三行定义一条路由</span><br><span class="line">ADDRESS#=TARGET</span><br><span class="line">NETMASK#=mask</span><br><span class="line">GATEWAY#=GW</span><br></pre></td></tr></table></figure></p>
+<h4 id="网络配置-1"><a href="#网络配置-1" class="headerlink" title="网络配置"></a>网络配置</h4><p>arpping -I eth* IP  查看网络IP是否冲突  </p>
+<p>旧工具：ifconfig、route、netstat<br>新工具：ip<br>图形化配置：system-config-network-tui，setup<br>配置文件  </p>
+<blockquote>
+<p>注意NetworkManager服务可能会引起network服务出现问题，可以关闭或者出现问题时重启服务</p>
+</blockquote>
+<h5 id="ifconfig"><a href="#ifconfig" class="headerlink" title="ifconfig"></a>ifconfig</h5><p>ifconfig eth<em> up|down  启用禁用网络接口 链路层禁用<br>ifup|ifdown eth</em>  系统层面禁用网卡IP功能    </p>
+<p>ifconfig eth<em> IP/netmask  临时配置IP地址<br>ifconfig eth</em>:1..2..3 IP/netmask 配置临时网卡别名<br>IP别名只能手工指定</p>
+<blockquote>
+<p>例如：<br>ifconfig eth0:0 192.168.1.100/24 up<br>ifconfig eth0:0 down</p>
+</blockquote>
+<h5 id="route"><a href="#route" class="headerlink" title="route"></a>route</h5><p>route -n 以数字模式显示路由表<br>route add -host IP gw IP dev eth<em>  新增主机路由<br>route add -net IP/netmask gw IP dev eth</em> 新增网络路由  </p>
+<blockquote>
+<p>通讯之前先查询路由表，再决定是否ARP广播，同网段删除本网段路由表项，表现为无法到达目标主机。单向无法回复ARP广播。  </p>
+</blockquote>
+<p>route add defaults gw IP metric N 添加默认路由并且指定费用优先级  </p>
+<p>centos6 可以service networkmange stop停掉图形化配置服务，避免影响network服务  </p>
+<p>mtr 目标IP 查看路由详细数据<br>tracerroute 查看路由详细数据</p>
+<p>回环地址属于内核级的通讯，只要数据通过路由到达即可转发  </p>
+<blockquote>
+<p>linux开启ipv4转发 修改/proc/sys/net/ipv4/ip_forward为1<br>route add default dev eth* 添加指定出口的默认路由<br>ping -I IP IP 可以指定IP去ping</p>
+</blockquote>
+<h5 id="netstat"><a href="#netstat" class="headerlink" title="netstat"></a>netstat</h5><table>
+<thead>
+<tr>
+<th>netstat</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-t</td>
+<td>tcp协议相关</td>
+</tr>
+<tr>
+<td>-u</td>
+<td>udp协议相关</td>
+</tr>
+<tr>
+<td>-w</td>
+<td>raw socket相关</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>处于监听状态</td>
+</tr>
+<tr>
+<td>-a</td>
+<td>所有状态</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>以数字显示IP和端口</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>扩展格式</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>显示相关进程及PID</td>
+</tr>
+<tr>
+<td>-nr</td>
+<td>以数字格式显示内核路由表</td>
+</tr>
+<tr>
+<td>-i</td>
+<td>显示接口统计数据</td>
+</tr>
+</tbody>
+</table>
+<p><strong>常用组合</strong>：<br>-tan, -uan, -tnl, -unl</p>
+<blockquote>
+<p>取链接状态并统计(两种方法)<br>1、netstat -ntua | sed -nr ‘1,2!s/.<em> ([[:alpha:]+])/\1/p’|sort |uniq -c<br>2、netstat -ntau | sed -nr ‘/^tcp/s/.</em> ([^ ]+) ?/\1/p’</p>
+</blockquote>
+<h5 id="IP-1"><a href="#IP-1" class="headerlink" title="IP"></a>IP</h5><p>使用语法：ip [ OPTIONS ] OBJECT { COMMAND | help }<br>OBJECT := { link | addr | route }  </p>
+<ol>
+<li>IP link set  设置网卡链路状态    </li>
+<li>IP addr<br>IP addr add IP/netmask dev eth<em> 设置网卡IP地址 IP addr add IP/netmask dev eth</em> label eth*:1…  新增网卡IP别名地址 </li>
+</ol>
+<blockquote>
+<p>例如：<br>ip addr add 172.16.100.100/16 dev eth0 label eth0:0<br>ip addr add 172.16.1.1/16 dev eth0 label eth0:0<br>ip addr add 172.16.1.2/16 dev eth0 label eth0:0<br>ip addr flush dev eth0 label eth0:0 清空网卡所有的设置</p>
+</blockquote>
+<ol start="3">
+<li>ip route<br>ip route add TARGET via GW dev IFACE src SOURCE_IP<blockquote>
+<p>例如：<br>ip route add 192.168.0.0/24 via 172.16.0.1<br>ip route add 192.168.1.13 via 172.16.0.1<br>ip route add default via 172.16.0.1 添加网关</p>
+</blockquote>
+</li>
+</ol>
+<p><strong>删除路由</strong>：ip route del TARGET<br><strong>显示路由</strong>：ip route show|list<br><strong>清空路由表</strong>：ip route flush dev eth0</p>
+<h5 id="SS"><a href="#SS" class="headerlink" title="SS"></a>SS</h5><p>性能较netstat更好</p>
+<table>
+<thead>
+<tr>
+<th>ss</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-t</td>
+<td>tcp协议相关</td>
+</tr>
+<tr>
+<td>-u</td>
+<td>udp协议相关</td>
+</tr>
+<tr>
+<td>-w</td>
+<td>裸套接字相关</td>
+</tr>
+<tr>
+<td>-x</td>
+<td>unix sock相关</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>listen状态的连接</td>
+</tr>
+<tr>
+<td>-a</td>
+<td>所有</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>数字格式</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>相关的程序及PID</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>扩展的信息</td>
+</tr>
+<tr>
+<td>-m</td>
+<td>内存用量</td>
+</tr>
+<tr>
+<td>-o</td>
+<td>计时器信息</td>
+</tr>
+</tbody>
+</table>
+<p><strong>常用组合</strong>：-tan, -tanl, -tanlp, -uan</p>
+<blockquote>
+<p>常见用法：<br>ss -l 显示本地打开的所有端口<br>ss -pl 显示每个进程具体打开的socket<br>ss -t -a 显示所有tcp socket<br>ss -u -a 显示所有的UDP Socekt<br>ss -o state established ‘( dport = :ssh or sport = :ssh )’ 显示所有已建立的ssh连接<br>ss -o state established ‘( dport = :http or sport = :http )’ 显示所有已建立的HTTP连接<br>ss -s 列出当前socket详细信息<br>ss -o stat establishd 查看已经链接的状态  </p>
+</blockquote>
+<h5 id="Bonding"><a href="#Bonding" class="headerlink" title="Bonding"></a>Bonding</h5><p>将多块网卡绑定同一IP地址对外服务，可以实现高可用或者负载均衡。</p>
+<ol>
+<li>Mode 0 (balance-rr)<br>轮转（Round-robin）策略：从头到尾顺序的在每一个slave接口上面发送数据包。本模式提供负载均衡和容错的能力。</li>
+<li>Mode 1 (active-backup)<br>活动-备份（主备）策略：只有一个slave被激活，当且仅当活动的slave接口失败时才会激活其他slave.为了避免交换机发生混乱此时绑定的MAC地址只有一个外部端口上可见。</li>
+<li>Mode 3 (broadcast)<br>广播策略：在所有的slave接口上传送所有的报文,提供容错能力。</li>
+</ol>
+<blockquote>
+<p>active-backup、balance-tlb 和 balance-alb 模式不需要交换机的任何特<br>殊配置。其他绑定模式需要配置交换机以便整合链接。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">示例：  </span><br><span class="line">1. 创建bonding设备的配置文件</span><br><span class="line">/etc/sysconfig/network-scripts/ifcfg-bond0</span><br><span class="line">DEVICE=bond0</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">BONDING_OPTS= “miimon=100 mode=0”</span><br><span class="line">1. /etc/sysconfig/network-scripts/ifcfg-eth0</span><br><span class="line">DEVICE=eth0</span><br><span class="line">BOOTPROTO=none</span><br><span class="line">MASTER=bond0</span><br><span class="line">SLAVE=yes</span><br><span class="line">USERCTL=no</span><br></pre></td></tr></table></figure>
+<p><strong>查看bond0状态</strong>：/proc/net/bonding/bond0<br><strong>删除bond0</strong>：ifconfig bond0 down、rmmod bonding</p>
+<blockquote>
+<p>miimon是用来进行链路监测的。如果miimon=100，那么系统每100ms 监测一次链路连接状态，如果有一条线路不通就转入另一条线路。</p>
+</blockquote>
+<h5 id="nmcli"><a href="#nmcli" class="headerlink" title="nmcli"></a>nmcli</h5><p>centos7新命令  </p>
+<p>nmcli [ OPTIONS ] OBJECT { COMMAND | help }</p>
+<p><strong>修改IP地址等属性</strong><br>nmcli connection modify IFACE [+|-]setting.property value<br>setting.property:<br>ipv4.addresses、ipv4.gateway、<br>ipv4.dns1、ipv4.method manual | auto</p>
+<blockquote>
+<p>例如：<br>1、显示网络接口属性<br>nmcli dev show eth0<br>2、创建新连接default，IP自动通过dhcp获取<br>nmcli con add con-name default type Ethernet ifname eth0<br>3、删除连接<br>nmcli con del default<br>4、创建新连接static ，指定静态IP，不自动连接<br>nmcti con add con-name static ifname eth0 autoconnect no type Ethernet ipv4.addresses 172.25.X.10/24 ipv4.gateway 172.25.X.254</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>nmcli con mod</th>
+<th>ifcfg-* 文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ipv4.method manual</td>
+<td>BOOTPROTO=none</td>
+</tr>
+<tr>
+<td>ipv4.method auto</td>
+<td>BOOTPROTO=dhcp</td>
+</tr>
+<tr>
+<td>ipv4.addresses “192.0.2.1/24 192.0.2.254”</td>
+<td>IPADDR0=192.0.2.1 PREFIX0=24 GATEWAY0=192.0.2.254 </td>
+</tr>
+<tr>
+<td>ipv4.dns 8.8.8.8</td>
+<td>DNS0=8.8.8.8</td>
+</tr>
+<tr>
+<td>ipv4.dns-search example.com</td>
+<td>DOMAIN=example.com</td>
+</tr>
+<tr>
+<td>ipv4.ignore-auto-dns true</td>
+<td>PEERDNS=no</td>
+</tr>
+<tr>
+<td>connection.autoconnect yes</td>
+<td>ONBOOT=yes</td>
+</tr>
+<tr>
+<td>connection.id eth0</td>
+<td>NAME=eth0</td>
+</tr>
+<tr>
+<td>connection.interface-name</td>
+<td>eth0 DEVICE=eth0 </td>
+</tr>
+<tr>
+<td>802-3-ethernet.mac-address…</td>
+<td>HWADDR=…</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>修改连接配置后，需要重新加载配置<br>nmcli con reload<br>nmcli con down “system eth0” 可被自动激活<br>nmcli con up “system eth0”<br>nmcli dev dis eth0 禁用网卡，访止被自动激活</p>
+</blockquote>
+<h5 id="网络测试工具"><a href="#网络测试工具" class="headerlink" title="网络测试工具"></a>网络测试工具</h5><ul>
+<li>在命令行下测试网络的连通性</li>
+<li>显示主机名<br>hostname</li>
+<li>测试网络连通性<br>ping</li>
+<li>显示正确的路由表<br>ip route</li>
+<li>跟踪路由<br>traceroute<br>tracepath<br>mtr  </li>
+<li>确定名称服务器使用<br>nslookup<br>host<br>dig</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/21/磁盘和文件系统/" rel="next" title="磁盘和文件系统">
+                <i class="fa fa-chevron-left"></i> 磁盘和文件系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">nieW</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#OSI网络模型"><span class="nav-number">1.</span> <span class="nav-text">OSI网络模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#物理层"><span class="nav-number">1.1.</span> <span class="nav-text">物理层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据链路层"><span class="nav-number">1.2.</span> <span class="nav-text">数据链路层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络层"><span class="nav-number">1.3.</span> <span class="nav-text">网络层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传输层"><span class="nav-number">1.4.</span> <span class="nav-text">传输层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#会话层"><span class="nav-number">1.5.</span> <span class="nav-text">会话层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表示层"><span class="nav-number">1.6.</span> <span class="nav-text">表示层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用层"><span class="nav-number">1.7.</span> <span class="nav-text">应用层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#网络传输协议"><span class="nav-number">1.7.1.</span> <span class="nav-text">网络传输协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pdu"><span class="nav-number">1.7.2.</span> <span class="nav-text">pdu</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vlan"><span class="nav-number">1.7.3.</span> <span class="nav-text">vlan</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP-IP协议栈"><span class="nav-number">1.8.</span> <span class="nav-text">TCP/IP协议栈</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-UDP"><span class="nav-number">1.8.1.</span> <span class="nav-text">TCP/UDP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP三次握手"><span class="nav-number">1.8.1.1.</span> <span class="nav-text">TCP三次握手</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UDP"><span class="nav-number">1.8.1.2.</span> <span class="nav-text">UDP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Internet层"><span class="nav-number">1.8.1.3.</span> <span class="nav-text">Internet层</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ICMP"><span class="nav-number">1.8.1.3.1.</span> <span class="nav-text">ICMP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ARP"><span class="nav-number">1.8.1.3.2.</span> <span class="nav-text">ARP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#IP"><span class="nav-number">1.8.1.3.3.</span> <span class="nav-text">IP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#常见IP地址"><span class="nav-number">1.8.1.3.4.</span> <span class="nav-text">常见IP地址</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由表"><span class="nav-number">1.8.2.</span> <span class="nav-text">路由表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络配置"><span class="nav-number">1.8.3.</span> <span class="nav-text">网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络配置文件"><span class="nav-number">1.8.3.1.</span> <span class="nav-text">网络配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络配置-1"><span class="nav-number">1.8.3.2.</span> <span class="nav-text">网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ifconfig"><span class="nav-number">1.8.3.2.1.</span> <span class="nav-text">ifconfig</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#route"><span class="nav-number">1.8.3.2.2.</span> <span class="nav-text">route</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#netstat"><span class="nav-number">1.8.3.2.3.</span> <span class="nav-text">netstat</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#IP-1"><span class="nav-number">1.8.3.2.4.</span> <span class="nav-text">IP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SS"><span class="nav-number">1.8.3.2.5.</span> <span class="nav-text">SS</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Bonding"><span class="nav-number">1.8.3.2.6.</span> <span class="nav-text">Bonding</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#nmcli"><span class="nav-number">1.8.3.2.7.</span> <span class="nav-text">nmcli</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#网络测试工具"><span class="nav-number">1.8.3.2.8.</span> <span class="nav-text">网络测试工具</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nieW</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
