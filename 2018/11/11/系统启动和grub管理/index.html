@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux组成单内核:linux 所有功能集成在同一程序微内核:windows 每种功能使用一个单独子系统   内核模块化: .ko（内核对象）动态装载和卸载例如：/lib/modules/3.10.0-862.14.4.el7.x86_64/kernel/fs/ 核心文件：/boot/vmlinuz-VERSION-releaseramdisk：辅助的伪根系统CentOS 5: /boot/in">
+<meta name="keywords" content="linux基础">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统启动和grub管理">
+<meta property="og:url" content="http://blog.nextx.tk/2018/11/11/系统启动和grub管理/index.html">
+<meta property="og:site_name" content="nieW learn">
+<meta property="og:description" content="Linux组成单内核:linux 所有功能集成在同一程序微内核:windows 每种功能使用一个单独子系统   内核模块化: .ko（内核对象）动态装载和卸载例如：/lib/modules/3.10.0-862.14.4.el7.x86_64/kernel/fs/ 核心文件：/boot/vmlinuz-VERSION-releaseramdisk：辅助的伪根系统CentOS 5: /boot/in">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/0CD7FC55A5994D949AD0892648AC784C?method=download&shareKey=c20a90f2e62b9c2458e6c4b7f719c0bf">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/1CDA0129FFD5489BA9A276F087F8D772?method=download&shareKey=69d9d9e9211be19612fe609be3a7964c">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/DA739FDF9E9B43EDA33725D294597BBC?method=download&shareKey=156437265744ec1f8469721c9e801d53">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/49B4F43525CF4C71B90206024F394B78?method=download&shareKey=b99e7af27353de5750e1b409bf339af0">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/EED58C583CFF4853A6E34B3A6C0F1018?method=download&shareKey=445e770c01196284d1f50b8ebb93a255">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/D83C6433B5204592A567FB1690D6F7DE?method=download&shareKey=3a2251b22f4c8f4db54e4fc5d2cca40a">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/16087F504E3147AC9A3930BC9B1EA3BA?method=download&shareKey=36cbea592b6a5d81fd752e8c243e2a24">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/3FACB6C698404BBF8E9F183738E7A0C0?method=download&shareKey=3c505fbb9fc7ac321bf475e6cba74caa">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/B94EAD135CB54F47811F06CD26C610D0?method=download&shareKey=f693ef2238883bbfbb067bc88ab046a4">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/16087F504E3147AC9A3930BC9B1EA3BA?method=download&shareKey=36cbea592b6a5d81fd752e8c243e2a24">
+<meta property="og:image" content="https://note.youdao.com/yws/api/personal/file/3FACB6C698404BBF8E9F183738E7A0C0?method=download&shareKey=3c505fbb9fc7ac321bf475e6cba74caa">
+<meta property="og:updated_time" content="2018-11-11T14:46:08.204Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="系统启动和grub管理">
+<meta name="twitter:description" content="Linux组成单内核:linux 所有功能集成在同一程序微内核:windows 每种功能使用一个单独子系统   内核模块化: .ko（内核对象）动态装载和卸载例如：/lib/modules/3.10.0-862.14.4.el7.x86_64/kernel/fs/ 核心文件：/boot/vmlinuz-VERSION-releaseramdisk：辅助的伪根系统CentOS 5: /boot/in">
+<meta name="twitter:image" content="https://note.youdao.com/yws/api/personal/file/0CD7FC55A5994D949AD0892648AC784C?method=download&shareKey=c20a90f2e62b9c2458e6c4b7f719c0bf">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.nextx.tk/2018/11/11/系统启动和grub管理/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>系统启动和grub管理 | nieW learn</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nieW learn</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.nextx.tk/2018/11/11/系统启动和grub管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nieW">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nieW learn">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">系统启动和grub管理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-11 22:43:58 / 修改时间：22:46:08" itemprop="dateCreated datePublished" datetime="2018-11-11T22:43:58+08:00">2018-11-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Linux组成"><a href="#Linux组成" class="headerlink" title="Linux组成"></a>Linux组成</h1><p>单内核:linux 所有功能集成在同一程序<br>微内核:windows 每种功能使用一个单独子系统  </p>
+<h2 id="内核"><a href="#内核" class="headerlink" title="内核"></a>内核</h2><p>模块化: .ko（内核对象）<br>动态装载和卸载<br>例如：/lib/modules/3.10.0-862.14.4.el7.x86_64/kernel/fs/</p>
+<p>核心文件：/boot/vmlinuz-VERSION-release<br>ramdisk：辅助的伪根系统<br>CentOS 5: /boot/initrd-VERSION-release.img<br>CentOS 6,7: /boot/initramfs-VERSION-release.img<br>模块文件：/lib/modules/VERSION-release  </p>
+<h2 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h2><ol>
+<li>post<br>Power-On-Self-Test，加电自检，是BIOS功能的一个主要部分。</li>
+<li>ROM<br>BIOS，Basic Input and Output System，保存着有关计算机系统最重要<br>的基本输入输出程序，系统信息设置、开机加电自检程序和系统启动自举程序等</li>
+<li>RAM<br>CMOS互补金属氧化物半导体，保存各项参数的设定   </li>
+<li>bootloader<br>引导加载器，引导程序<br>windows: ntloader，仅是启动OS<br>Linux：功能丰富，提供菜单，允许用户选择要启动系统或不同的内核版本；把用户选定的内核装载到内存中的特定空间中，解压、展开，并把系统控制权移交给内核<br>LILO：LInux LOader<br>GRUB: GRand Unified Bootloader<br>GRUB 0.X: GRUB Legacy， GRUB2    </li>
+</ol>
+<ul>
+<li>MBR：第一扇区<br>前446字节 bootloader<br>中间64字节 分区表<br>最后2字节 55AA  </li>
+<li>GRUB<br>1.5阶段  寻找磁盘固定位置的二进制数据<br>2阶段 寻找磁盘分区文件  /boot/grub</li>
+</ul>
+<ol start="5">
+<li>加载内核/boot/vmlinuz…<br>通过/initramfs….img加载文件系统驱动<br>加载硬件驱动程序（借助于ramdisk加载驱动）<br>以只读方式挂载根文件系统<br>运行用户空间的第一个应用程序：/sbin/init</li>
+</ol>
+<blockquote>
+<p>ramdisk：内核中的特性之一：使用缓冲和缓存来加速对磁盘上的文件访问，并加载相应的硬件驱动<br>ramdisk –&gt; ramfs 提高速度<br>CentOS 5: initrd<br>工具程序：mkinitrd<br>CentOS 6，7: initramfs<br>工具程序：mkinitrd, dracut  </p>
+</blockquote>
+<hr>
+<p><strong>系统初始化</strong>：<br>POST –&gt; BootSequence (BIOS) –&gt; Bootloader(MBR) –&gt;<br>kernel(ramdisk) –&gt; rootfs(只读) –&gt; init（systemd）</p>
+<h3 id="ramdisk管理"><a href="#ramdisk管理" class="headerlink" title="ramdisk管理"></a>ramdisk管理</h3><p>ramdisk文件的制作：  </p>
+<ul>
+<li>mkinitrd命令<br>为当前正在使用的内核重新制作ramdisk文件<br>#<strong>uname -r生产内核版本号以便制作此文件</strong><br><code>mkinitrd /boot/initramfs-$(uname -r).img $(uname -r)</code>  </li>
+<li>dracut命令<br>为当前正在使用的内核重新制作ramdisk文件<br><code>dracut /boot/initramfs-$(uname -r).img $(uname -r)</code>  </li>
+</ul>
+<hr>
+<p>实验：误删除initramfs文件恢复(centos6)  </p>
+<ol>
+<li>系统重启后故障画面<br><img src="https://note.youdao.com/yws/api/personal/file/0CD7FC55A5994D949AD0892648AC784C?method=download&amp;shareKey=c20a90f2e62b9c2458e6c4b7f719c0bf" alt="init"></li>
+<li>使用系统版本对应的光盘进入救援模式</li>
+<li>切根后输入<code>mkinitrd /boot/initramfs-$(uname -r).img $(uname -r)</code>重新恢复文件<br><img src="https://note.youdao.com/yws/api/personal/file/1CDA0129FFD5489BA9A276F087F8D772?method=download&amp;shareKey=69d9d9e9211be19612fe609be3a7964c" alt="init"></li>
+</ol>
+<blockquote>
+<p>修复后注意sync写入磁盘，避免出现故障  </p>
+</blockquote>
+<h3 id="init初始化"><a href="#init初始化" class="headerlink" title="init初始化"></a>init初始化</h3><p>init读取其初始化文件：/etc/inittab<br>初始运行级别(RUN LEVEL)<br>系统初始化脚本<br>对应运行级别的脚本目录<br>捕获某个关键字顺序<br>定义UPS电源终端/恢复脚本<br>在虚拟控制台生成getty<br>在运行级别5初始化X  </p>
+<ul>
+<li>启动配置文件<br><strong>centos6</strong> init程序:Upstart<br>/etc/inittab<br>/etc/init/*.conf<br><strong>centos7</strong>: systemd<br>/usr/lib/systemd/system<br>/etc/systemd/system  <blockquote>
+<p>设置开机启动模式systemctl set-default runlevel3.target</p>
+</blockquote>
+</li>
+</ul>
+<p>runlevel就是各个服务的集合<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">运行级别：为系统运行或维护等目的而设定；0-6：7个级别</span><br><span class="line">0：关机</span><br><span class="line">1：单用户模式(root自动登录), single, 维护模式（无网络维护模式）可破解root口令</span><br><span class="line">2: 多用户模式，启动网络功能，但不会启动NFS；维护模式</span><br><span class="line">3：多用户模式，正常模式；文本界面</span><br><span class="line">4：预留级别；可同3级别</span><br><span class="line">5：多用户模式，正常模式；图形界面</span><br><span class="line">6：重启</span><br><span class="line">默认级别：3, 5</span><br><span class="line">切换级别：init #</span><br><span class="line">查看级别：runlevel ; who -r</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>修复init设置错误<br>1、在系统倒计时时按任意键<br>2、进入内核选择界面，选择 “a” 编辑内核文件<br>3、在文件结尾添加想要进入的运行模式，比如3（文件为/etc/boot/grub.conf),临时进入系统跳过系统设置的错误值</p>
+</blockquote>
+<ul>
+<li><p>系统初始化脚本<br>/etc/rc.d/rc.sysinit: 系统初始化脚本<br>1、设置主机名<br>2、设置欢迎信息<br>3、激活udev和selinux<br>4、挂载/etc/fstab文件中定义的文件系统<br>5、检测根文件系统，并以读写方式重新挂载根文件系统<br>6、设置系统时钟<br>7、激活swap设备<br>8、根据/etc/sysctl.conf文件设置内核参数<br>9、激活lvm及software raid设备<br>10、加载额外设备的驱动程序<br>11、清理操作  </p>
+</li>
+<li><p>按照设定的runlevel运行相对应的脚本<br><strong>说明：rc N –&gt; 意味着读取/etc/rc.d/rcN.d/</strong><br>K<em>: K##</em>：##运行次序；数字越小，越先运行；数字越小的服务，通常为<br>依赖到别的服务<br>S<em>: S##</em>：##运行次序；数字越小，越先运行；数字越小的服务，通常为<br>被依赖到的服务  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">for srv in /etc/rc.d/rcN.d/K*; do</span><br><span class="line">    $srv stop</span><br><span class="line">done</span><br><span class="line">for srv in /etc/rc.d/rcN.d/S*; do</span><br><span class="line">    $srv start</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>/etc/rc.d/rcN.d/中的文件都是软链接文件，对应/etc/init.d/中的文件<br>切换各runlevel会运行脚本停止或启动各个服务</p>
+</blockquote>
+<h2 id="chkconfig配置命令"><a href="#chkconfig配置命令" class="headerlink" title="chkconfig配置命令"></a>chkconfig配置命令</h2><ul>
+<li><p>ntsysv设置开机启动的服务 每次只能修改一种运行级别的服务<br>ntsysv –level </p>
+</li>
+<li><p>chkconfig  </p>
+</li>
+</ul>
+<p>查看服务在所有级别的启动或关闭设定情形：<br>chkconfig [–list] [name]<br>添加：chkconfig –add name<br>删除：chkconfig –del name<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chkconfig --level 35 atd on  #修改atd在runlevel 3和5的启动  </span><br><span class="line">chkconfig --list atd  </span><br><span class="line"></span><br><span class="line">常用的方式</span><br><span class="line">chkconfig atd on 默认设置2345模式下的开机启动</span><br></pre></td></tr></table></figure></p>
+<p><strong>service命令调用的/etc/init.d/中的命令来管理服务</strong></p>
+<blockquote>
+<p>自定义的启动脚本服务建议放置在S开头靠后的位置<br>/etc/init.d/rc*.<strong>d目录下的文件时由文件开头的字符排序得到</strong>，不是数字排序  </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">#简单启动脚本示例</span><br><span class="line">#chkconfig: 35 98 03 #想要开机运行的runlevel S开头的排序号 K开头的排序号</span><br><span class="line">#description: test services</span><br><span class="line"></span><br><span class="line">. /etc/init.d/functions #引用系统函数</span><br><span class="line">case $1 in</span><br><span class="line"></span><br><span class="line">start)</span><br><span class="line">        touch /var/lock/subsys/testsrv #如果是运行命令，就创建文件并打印启动服务</span><br><span class="line">        action &quot;Starting testsrv&quot; true</span><br><span class="line">        ;;</span><br><span class="line">stop)</span><br><span class="line">        rm -f /var/lock/subsys/testsrv #如果是停止命令，就删除文件并打印停止服务</span><br><span class="line">        action &quot;Stopping testsrv&quot; true</span><br><span class="line">        ;;</span><br><span class="line">restart)</span><br><span class="line">        action &quot;Stopping testsrv&quot; true</span><br><span class="line">        action &quot;Starting testsrv&quot; true</span><br><span class="line">        ;;</span><br><span class="line">status)</span><br><span class="line">        if [ -f /var/lock/subsys/testsrv ];then #判断启动模式，通过运行命令创建的文件是否存在得知</span><br><span class="line">                echo testsrv is running...</span><br><span class="line">        else</span><br><span class="line">                echo testsrv is stopped</span><br><span class="line">        fi</span><br><span class="line">        ;;</span><br><span class="line">*)</span><br><span class="line">        echo Usage: /etc/init.d/testsrv &#123;start|stop|restart|status&#125; #打印服务管理命令</span><br><span class="line">esac</span><br><span class="line"></span><br><span class="line">运行效果：</span><br><span class="line">[root@Centos6 init.d]# ./testsrv start</span><br><span class="line">Starting testsrv                       [  OK  ]</span><br><span class="line">[root@Centos6 init.d]# ./testsrv status</span><br><span class="line">testsrv is running...</span><br><span class="line">[root@Centos6 init.d]# ./testsrv stop</span><br><span class="line">Stopping testsrv                       [  OK  ]</span><br><span class="line">[root@Centos6 init.d]# ./testsrv status</span><br><span class="line">testsrv is stopped</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">通过chkconfig --add testsrv   就可以添加到管理列表中，并会在设置的runlevel3和5中创建相应的软链接文件</span><br><span class="line">![chkconfig](https://note.youdao.com/yws/api/personal/file/6A199844416C49E6B278F811636AA0E9?method=download&amp;shareKey=d7d41f383404c1e8f5e5bee2adc566fd)                 </span><br><span class="line"></span><br><span class="line">可以使用chkconfig --del testsrv删除服务列表  </span><br><span class="line">对应的操作：删除了/etc/rc*.d/中的软链接文件  </span><br><span class="line"></span><br><span class="line">## xinetd</span><br><span class="line"></span><br><span class="line">瞬态(Transient)服务被xinetd进程所管理  </span><br><span class="line">进入的请求首先被xinetd代理   </span><br><span class="line">配置文件：  </span><br><span class="line">/etc/xinetd.conf  </span><br><span class="line">/etc/xinetd.d/&lt;service&gt;   </span><br><span class="line">与libwrap.so文件链接   </span><br><span class="line">用chkconfig控制的服务：   </span><br><span class="line">示例：chkconfig tftp on  </span><br><span class="line"></span><br><span class="line">超级守护进程centos6</span><br><span class="line"></span><br><span class="line">&gt; xinted代理人 负责唤醒其它服务   </span><br><span class="line">非独立服务、适合不经常启动的服务、开机不启动  </span><br><span class="line"></span><br><span class="line">启动xinetd服务即可管理受控服务，会自动唤醒被管理的服务</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">S99local **/etc/rc.d/rc/local** 可以接管所有不想写启动脚本的服务   </span><br><span class="line">默认可以启动脚本内的服务，**但不能通过service管理**，只能通过kill关闭  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">CentOS 6启动流程：</span><br><span class="line">POST</span><br></pre></td></tr></table></figure>
+<p>Boot Sequence(BIOS) –&gt; Boot Loader –&gt; Kernel(ramdisk) –&gt;rootfs –&gt; switchroot –&gt; /sbin/init –&gt;(/etc/inittab,/etc/init/*.conf) –&gt; 设定默认运<br>行级别 –&gt; 系统初始化脚本rc.sysinit –&gt; 关闭或启动对应级别的服务 –&gt; 启动终端<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">![boot](http://s4.51cto.com/wyfs02/M02/87/20/wKiom1fVBELjXsvaAAUkuL83t2Q304.jpg)</span><br><span class="line"># grub</span><br><span class="line"></span><br><span class="line">grub: GRand Unified Bootloader   </span><br><span class="line">grub 0.97: grub legacy  #老版本 centos6   </span><br><span class="line">grub 2.x: grub2 #新版本 centos7   </span><br><span class="line">grub legacy:   </span><br><span class="line">stage1: mbr   </span><br><span class="line">stage1_5: mbr之后的扇区，让stage1中的bootloader能识别stage2所在</span><br><span class="line">的分区上的文件系统   </span><br><span class="line">stage2：磁盘分区(/boot/grub/)   </span><br><span class="line"></span><br><span class="line">实验：   </span><br><span class="line">1.5阶段的MBR启动分区被破坏的修复   </span><br><span class="line">1、启动分区的MBR前446字节被破坏</span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/B2A4879AABCF4E9693BF818DE53BAB04?method=download&amp;shareKey=94e10b7f39acf2a892f159365f9be860)   </span><br><span class="line">2、重启之后直接会进入光盘界面，等待被修复  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/C40BDABCC8E6483591B9F9949593CE08?method=download&amp;shareKey=af1d56b45fd76a65fe46719dc69f2dc1)   </span><br><span class="line">修复方法一：    </span><br><span class="line">3、进入修复界面切换根目录chroot /mnt/sysimage运行 grub-install /dev/sda   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/938A5C0206EC449792DA5AC99FC287AF?method=download&amp;shareKey=9e551d61078dbfe3994926a48ed5da88)  </span><br><span class="line">&gt; 也可以使用grub-install命令在没有重启的情况下修复，而且不依赖/etc/grub中的文件，更为通用</span><br><span class="line"></span><br><span class="line">修复方法二：</span><br><span class="line">在没有重启的情况下，可以直接修复</span><br><span class="line">使用grub命令进入交互式  </span><br><span class="line">grub&gt; root (hd#,#)    #boot所在的磁盘、分区序号    </span><br><span class="line">grub&gt; setup (hd#) #MBR写入的硬盘序列号  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/7C303012D3364865AB817AA355ACDBF2?method=download&amp;shareKey=e993d64c0643904a6691d8b5b804842d)  </span><br><span class="line">&gt; 此修复方法依赖/etc/grub中的文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- 修复过的扇区文件和初始安装的状态并不一样，初始安装的512之后的删除都是空白扇区</span><br><span class="line"></span><br><span class="line">- /boot/grub中的文件除grub.conf外是硬盘分区时段的备份文件</span><br><span class="line"></span><br><span class="line">- 使用grub-install修复过的硬盘如果再次破坏/etc/grub中的文件，将导致不能引导   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/A4670032045945A9AA3FD8F25A0F1F76?method=download&amp;shareKey=426a1841bbbf45835d3bdb926f7184a8)</span><br><span class="line"></span><br><span class="line">- rhgb 图形界面启动画面  建议修改为字符界面 修改/boot/gurb/grub.conf(centos6) 删除rhbg字符</span><br><span class="line"></span><br><span class="line">## grub legacy</span><br><span class="line"></span><br><span class="line">配置文件：/boot/grub/grub.conf &lt;--/etc/grub.conf  </span><br><span class="line">stage2及内核等通常放置于一个基本磁盘分区  </span><br><span class="line">功用：</span><br><span class="line">- 提供启动菜单、并提供交互式接口</span><br><span class="line">a：内核参数</span><br><span class="line">e: 编辑模式，用于编辑菜单</span><br><span class="line">c: 命令模式，交互式接口</span><br><span class="line">- 加载用户选择的内核或操作系统</span><br><span class="line">允许传递参数给内核</span><br><span class="line">可隐藏启动菜单</span><br><span class="line">- 为菜单提供了保护机制</span><br><span class="line">为编辑启动菜单进行认证</span><br><span class="line">为启用内核或操作系统进行认证</span><br><span class="line"></span><br><span class="line">&gt; 识别硬盘设备(hd#,#)  </span><br><span class="line">hd#: 磁盘编号，用数字表示；从0开始编号  </span><br><span class="line">#: 分区编号，用数字表示; 从0开始编号  </span><br><span class="line">(hd0,0) 第一块硬盘，第一个分区</span><br></pre></td></tr></table></figure></p>
+<p>手动在grub命令行接口启动系统<br>grub&gt; root (hd#,#) #MBR所在磁盘和分区<br>grub&gt; kernel /vmlinuz-VERSION-RELEASE ro root=/dev/DEVICE #内核的文件路径<br>grub&gt; initrd /initramfs-VERSION-RELEASE.img<br>grub&gt; boot #文件系统驱动路径<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### grub legacy配置文件</span><br><span class="line"></span><br><span class="line">配置文件：/boot/grub/grub.conf  </span><br><span class="line">**default**=#: 设定默认启动的菜单项；落单项(title)编号从0开始   </span><br><span class="line">**timeout**=#：指定菜单项等待选项选择的时长   </span><br><span class="line">splashimage=(hd#,#)/PATH/XPM_FILE：菜单背景图片文件路径   </span><br><span class="line">password [--md5] STRING: 启动菜单编辑认证   </span><br><span class="line">hiddenmenu：隐藏菜单   </span><br><span class="line">**title** TITLE：定义菜单项“标题”, 可出现多次   </span><br><span class="line">**root** (hd#,#)：查找stage2及kernel文件所在设备分区；为grub的根   </span><br><span class="line">**kernel** /PATH/TO/VMLINUZ_FILE [PARAMETERS]：启动的内核   </span><br><span class="line">**initrd** /PATH/TO/INITRAMFS_FILE: 内核匹配的ramfs文件   </span><br><span class="line">password [--md5|--encrypted ] STRING: 启动选定的内核或操作系统时进行认证   </span><br><span class="line"></span><br><span class="line">&gt; 注意配置文件的顺序，initrd和kernel必须是kernel在前，否则不能启动  </span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">**实验**：配置文件顺序开机错误</span><br><span class="line"></span><br><span class="line">1. 配置文件顺序错误后的报错画面   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/E6B9626CF445464FA22B7670A685EC99?method=download&amp;shareKey=6b42af323e9b7a8f929c0b47fbec5582)  </span><br><span class="line">修复方法：  </span><br><span class="line">1. 进入内核选择界面，按“e”，编辑启动文件   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/72F87AB9BB4149CD99D0E6C4D29CA2F7?method=download&amp;shareKey=dbf59d5cba671c6b9696ee1b2e2c847c)  </span><br><span class="line">2. 看到错误顺序的启动文件，选中顺序错误的inird行，按“d”删除   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/7D42E4FE0219487B9EB838E393476468?method=download&amp;shareKey=f20706c9bfe1d6de19627c2d61eb9fac)  </span><br><span class="line">3. 按“o”--“e”，重新编辑一行initrd   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/68B51ECEE14549D3A9645C783F0CBAC9?method=download&amp;shareKey=5c537e8f3b8b51b7f6c1f7ce903c68ec)  </span><br><span class="line">4. 按“b”重启即可   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/64BF10FA4F95476AACFBDA2E730699B7?method=download&amp;shareKey=b90098a9032ef033117d2f6d5f5dd97c)  </span><br><span class="line">5. 进入系统记得修改错误的/etc/grub.conf文件</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">## grub加密</span><br><span class="line"></span><br><span class="line">生成grub口令</span><br><span class="line">- grub-md5-crypt</span><br><span class="line">- grub-crypt  </span><br><span class="line"></span><br><span class="line">在/etc/grub.conf中添加密码行  </span><br><span class="line">password --md5 生成的密码  </span><br><span class="line">password --encrypted 生成的密码  </span><br><span class="line"></span><br><span class="line">破解root口令：  </span><br><span class="line">启动系统时，设置其运行级别1</span><br><span class="line">进入单用户模式：</span><br><span class="line">- 编辑grub菜单(选定要编辑的title，而后使用a 或 e 命令)</span><br><span class="line">- 在选定的kernel后附加</span><br><span class="line">1, s, S，single 都可以</span><br><span class="line">- 在kernel所在行，键入“b”命令</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">**实验**：误删boot目录后恢复</span><br><span class="line">1. 重启后直接进入grub编辑界面，由于找不到配置文件引起的错误   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/E08C46E12F744A5AB9A5E0051549A2B2?method=download&amp;shareKey=a5db3a9c2f91a9f45f7774920f8030e6)  </span><br><span class="line">2. 光盘重启进入救援模式，使用rpm -ivh /mnt/cdrom/Packages/kerner-2.6.*** --root=/mnt/sysimage/ --force重新安装内核文件，chroot /mnt/sysimage后使用grub-install /dev/sda命令生成grub文件  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/2809E213C7E7494DA271939462793816?method=download&amp;shareKey=16727eb21caf61d8d185c371500130d7)   </span><br><span class="line">3. 进入/boot/grub/ 重新编辑grub文件，内核和initrd文件过长，可以使用r!ls /boot/vm... /boot/init...调用，避免出错。  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/5B8259E5E66A4F369284AAB192A815DD?method=download&amp;shareKey=a744532040f63ca69c764d4751b634c7)  </span><br><span class="line"></span><br><span class="line">&gt; 最后最好再检查一下/etc/selinux/config中的运行状态是disabled。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">实验：fstab文件和/boot目录被破坏，恢复 错误代码15  </span><br><span class="line">1. blkid查看分区和UUID   </span><br><span class="line">2. fdisk -l查看分区大小，mkdir /mnt/rootfs，使用mount挂载后查看有可能的分区 </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/B195491CBB99413199FA16D97EB88931?method=download&amp;shareKey=bb04c0f8879f9ed890c084c17f7d0b42)  </span><br><span class="line">3. 修复fstab文件   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/96B803C6BECB43E88B02AAF02E2CFE68?method=download&amp;shareKey=54f893a80f1394e727241d7b1e4f47f4)  </span><br><span class="line">4. 重新光盘启动，即可发现系统分区   </span><br><span class="line">5. 重新安装kernel、grub-install   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/2809E213C7E7494DA271939462793816?method=download&amp;shareKey=16727eb21caf61d8d185c371500130d7)    </span><br><span class="line">6. 重新配置grub.conf文件   </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/5B8259E5E66A4F369284AAB192A815DD?method=download&amp;shareKey=a744532040f63ca69c764d4751b634c7)  </span><br><span class="line"></span><br><span class="line">&gt; 最后最好再检查一下/etc/selinux/config中的运行状态是disabled  </span><br><span class="line">如果提前chroot切根后，使用 rpm -ivh /mnt/cdrom/kernel-... --force强行安装内核</span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">实验：lv逻辑卷分区fstab文件和/boot目录破坏，恢复   </span><br><span class="line">1. lvs查看现有逻辑卷的分区、lvdisplay查看逻辑卷状态   </span><br><span class="line">2. 不能使用mount挂载，逻辑卷组被禁用状态  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/D25B195394F640F3ABA8BE18DE8A5A7B?method=download&amp;shareKey=e790fe9d597c3dc4a19957d37dd97494)  </span><br><span class="line">3. 首先需要vgchage -ay激活逻辑卷  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/B1F4A0ABEAA04A3D9F1AB263A3E1A25C?method=download&amp;shareKey=83a34cba0bb5b20c36e9d05092d40a79)  </span><br><span class="line">4. mkdir /mnt/rootfs  mount挂载分区  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/F776A2636CD24B2EB8BB72D7D0862F0E?method=download&amp;shareKey=6a59e083e06e193173817e615c341cde)   </span><br><span class="line">5. 重写fstab文件  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/AF66100F829D4A84B57CA1F88EE91055?method=download&amp;shareKey=b17aab7d323cdc25cc628b88345c6b3e)  </span><br><span class="line">6. 光盘重启，进入常规修复 </span><br><span class="line">7. 重新安装kernel、grub-install </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/AE219E055193453EBACA5B612745B1A9?method=download&amp;shareKey=48be84cd2f79549e1d5eba511875dd59)</span><br><span class="line">8. 重新配置grub.conf文件  </span><br><span class="line">![MBR](https://note.youdao.com/yws/api/personal/file/0B91B27A84FD41F8852A0FB956EDBF78?method=download&amp;shareKey=d49501fa22958f26f4a0586ebdf2426f)  </span><br><span class="line">&gt; 注意grub.conf中逻辑卷的root目录写法  </span><br><span class="line"></span><br><span class="line"># /proc目录</span><br><span class="line"></span><br><span class="line">内核把自己内部状态信息及统计信息，以及可配置参数通过proc伪文件系统加以输出  </span><br><span class="line"></span><br><span class="line">/proc/sys</span><br><span class="line">- sysctl命令用于查看或设定此目录中诸多参数  </span><br><span class="line">sysctl -w path.to.parameter=VALUE  </span><br><span class="line">sysctl -w kernel.hostname=mail.magedu.com  </span><br><span class="line">- echo命令通过重定向方式也可以修改大多数参数的值  </span><br><span class="line">echo &quot;VALUE&quot; &gt; /proc/sys/path/to/parameter  </span><br><span class="line">echo “websrv” &gt; /proc/sys/kernel/hostname  </span><br><span class="line"></span><br><span class="line">sysctl命令：  </span><br><span class="line">默认配置文件：**/etc/sysctl.conf**（centos6）  </span><br><span class="line">- 设置某参数  </span><br><span class="line">**sysctl -w** parameter=VALUE  </span><br><span class="line">- 通过读取配置文件设置参数(一些修改过的值需重启才可生效)   </span><br><span class="line">**sysctl -p** [/path/to/conf_file]  </span><br><span class="line">- 查看所有生效参数  </span><br><span class="line">**sysctl -a**  </span><br><span class="line"></span><br><span class="line">常用的几个参数：默认0为关闭或忽略  1为启用  </span><br><span class="line">#内核路由转发功能  </span><br><span class="line">net.ipv4.ip_forward   </span><br><span class="line">#内核忽略ICMP响应  </span><br><span class="line">net.ipv4.icmp_echo_ignore_all   </span><br><span class="line">#清理内核缓存  </span><br><span class="line">vm.drop_caches </span><br><span class="line"></span><br><span class="line"># /sys目录</span><br><span class="line"></span><br><span class="line">- sysfs：为用户使用的伪文件系统，输出内核识别出的各硬件设备的相关属性信息，也有内核对硬件特性的设定信息；有些参数是可以修改的，用于调整硬件。</span><br><span class="line"></span><br><span class="line">工作特性</span><br><span class="line">- udev通过此路径下输出的信息动态为各设备创建所需要设备文件，udev是运行用户空间程序。</span><br><span class="line"></span><br><span class="line">专用工具：udevadmin, hotplug</span><br><span class="line">- udev为设备创建设备文件时，会读取其事先定义好的规则文件，一般在`/etc/udev/rules.d`及`/usr/lib/udev/rules.d`目录下</span><br><span class="line"></span><br><span class="line"># 内核编译  </span><br><span class="line"></span><br><span class="line">单内核体系设计、但充分借鉴了微内核设计体系的优点，为内核引入模块化机制</span><br><span class="line"></span><br><span class="line">内核组成部分：  </span><br><span class="line"></span><br><span class="line">- kernel：内核核心，一般为bzImage，通常在/boot目录下，名称为 vmlinuz-VERSION-RELEASE  </span><br><span class="line">只集成必要的常用模块</span><br><span class="line"></span><br><span class="line">- kernel object：内核对象，一般放置于</span><br><span class="line">**/lib/modules/VERSION-RELEASE/**  </span><br><span class="line">非必要的模块，按需启动，例如大量的驱动程序  </span><br><span class="line">[ ]: N 不启用  </span><br><span class="line">[M]: M 存放在/lib/modules中  </span><br><span class="line">[*]: Y 启用到kernel中</span><br><span class="line"></span><br><span class="line">- 辅助文件：ramdisk initrd initramfs</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">**查看内核信息**</span><br><span class="line">uname | 说明</span><br><span class="line">---|---</span><br><span class="line">-n | 显示节点名称</span><br><span class="line">-r | 显示VERSION-RELEASE</span><br><span class="line">-a | 显示所有信息</span><br><span class="line"> |</span><br><span class="line">lsmod | 显示由核心已经装载的内核模块</span><br><span class="line">--- | 显示的内容来自于/proc/modules文件 </span><br><span class="line">|</span><br><span class="line">modinfo | 显示模块的详细描述信息</span><br><span class="line">-n | 只显示模块文件路径</span><br><span class="line">-p | 显示模块参数</span><br><span class="line">-a | 作者</span><br><span class="line">-d | 描述 </span><br><span class="line"></span><br><span class="line">## 内核模块管理</span><br><span class="line"></span><br><span class="line">硬件模块的信息，不常修改  </span><br><span class="line"></span><br><span class="line">- modprobe命令：装载或卸载内核模块，自动解决依赖性    </span><br><span class="line">modprobe [ -C config-file ] [ modulename ] [ module parame-ters... ]  </span><br><span class="line">modprobe [ -r ] modulename…  </span><br><span class="line">配置文件：/etc/modprobe.conf, /etc/modprobe.d/*.conf</span><br><span class="line"></span><br><span class="line">- depmod命令：内核模块依赖关系文件及系统信息映射文件的生成工具  </span><br><span class="line"></span><br><span class="line">- insmod命令 指定模块文件，不自动解决依赖模块</span><br><span class="line">insmod [ filename ] [ module options... ]  </span><br><span class="line">insmod `modinfo –n exportfs`  </span><br><span class="line">lnsmod `modinfo –n xfs`  </span><br><span class="line">- rmmod命令：卸载模块  </span><br><span class="line">rmmod [ modulename ]  </span><br><span class="line">rmmod xfs  </span><br><span class="line">rmmod exportfs  </span><br><span class="line"></span><br><span class="line">## 编译内核</span><br><span class="line"></span><br><span class="line">前提：  </span><br><span class="line">1. 准备好开发环境  </span><br><span class="line">2. 获取目标主机上硬件设备的相关信息  </span><br><span class="line">3. 获取目标主机系统功能的相关信息  </span><br><span class="line"> 例如:需要启用相应的文件系统  </span><br><span class="line">4. 获取内核源代码包  </span><br><span class="line"> www.kernel.org</span><br><span class="line">&gt; 使用lscpu、lsblk等可以方便的查看硬件信息</span><br><span class="line"></span><br><span class="line">编译流程：</span><br><span class="line">- 安装开发包组 #yum groupinstall &quot;development tools&quot;</span><br><span class="line">- 下载源码文件</span><br><span class="line">- .config：准备文本配置文件  </span><br><span class="line">可以参考现有系统的配置文件，将/boot下的.config文件cp到准备编译的目录下</span><br><span class="line">- make menuconfig：图形化配置内核选项</span><br><span class="line">- make [-j #] #指定线程数提高效率</span><br><span class="line">- make modules_install：安装模块</span><br><span class="line">- make install ：安装内核相关文件  </span><br><span class="line">安装bzImage为/boot/vmlinuz-VERSION-RELEASE  </span><br><span class="line">生成initramfs文件  </span><br><span class="line">编辑grub的配置文件</span><br></pre></td></tr></table></figure></p>
+<p>示例<br>tar xf linux-3.10.67.tar.xz -C /usr/src<br>cd /usr/src<br>ln -sv linux-3.10.67 linux<br>cd /usr/src/linux<br>cp /boot/config-$(uname -r) ./.config<br>make help<br>make menuconfig #图形化配置<br>make -j 2 #指定线程数提高效率<br>make modules_install<br>make install<br>reboot<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br></pre></td><td class="code"><pre><span class="line">- 配置内核选项  </span><br><span class="line">支持“更新”模式进行配置：make help  </span><br><span class="line">(a) make config：基于命令行以遍历的方式配置内核中可配置的每个选项   </span><br><span class="line">(b) make menuconfig：基于curses的文本窗口界面  </span><br><span class="line">(c) make gconfig：基于GTK (GNOME）环境窗口界面  </span><br><span class="line">(d) make xconfig：基于QT(KDE)环境的窗口界面  </span><br><span class="line">支持“全新配置”模式进行配置   </span><br><span class="line">(a) make defconfig：基于内核为目标平台提供的“默认”配置进行配置  </span><br><span class="line">(b) make allyesconfig: 所有选项均回答为“yes“    </span><br><span class="line">(c) make allnoconfig: 所有选项均回答为“no“  </span><br><span class="line"></span><br><span class="line">- 编译  </span><br><span class="line">全编译:make [-j #]   </span><br><span class="line">编译内核的一部分功能：   </span><br><span class="line">(a) 只编译某子目录中的相关代码   </span><br><span class="line">cd /usr/src/linux   </span><br><span class="line">make dir/   </span><br><span class="line">(b) 只编译一个特定的模块   </span><br><span class="line">cd /usr/src/linux   </span><br><span class="line">make dir/file.ko   </span><br><span class="line">示例：只为e1000编译驱动：写出准确的编译路径   </span><br><span class="line">make drivers/net/ethernet/intel/e1000/e1000.ko</span><br><span class="line"></span><br><span class="line">- 如何交叉编译内核：  </span><br><span class="line">编译的目标平台与当前平台不相同  </span><br><span class="line">make ARCH=arch_name  </span><br><span class="line">要获取特定目标平台的使用帮助  </span><br><span class="line">make ARCH=arch_name help  </span><br><span class="line">示例：  </span><br><span class="line">make ARCH=arm help  </span><br><span class="line"></span><br><span class="line">### 清理编译文件</span><br><span class="line"></span><br><span class="line">在已经执行过编译操作的内核源码树做重新编译</span><br><span class="line"></span><br><span class="line">需要事先清理操作：  </span><br><span class="line">**make clean**：清理大多数编译生成的文件，但会保留config文件等   </span><br><span class="line">**make mrproper**: 清理所有编译生成的文件、config及某些备份文件  </span><br><span class="line">**make distclean**：mrproper、清理patches以及编辑器备份文件   </span><br><span class="line"></span><br><span class="line">### 卸载内核</span><br><span class="line">删除/lib/modules/目录下不需要的内核库文件  </span><br><span class="line">删除/usr/src/linux/目录下不需要的内核源码  </span><br><span class="line">删除/boot目录下启动的内核和内核映像文件  </span><br><span class="line">更改grub的配置文件，删除不需要的内核启动列表  </span><br><span class="line"></span><br><span class="line"># Centos7 systemd</span><br><span class="line"></span><br><span class="line">开机流程  </span><br><span class="line">`POST --&gt; Boot Sequence --&gt; Bootloader --&gt; kernel + initramfs(initrd) --&gt; rootfs --&gt; /sbin/init`  </span><br><span class="line">init: 各版本区别   </span><br><span class="line">CentOS 5 SysV init  </span><br><span class="line">CentOS 6 Upstart  </span><br><span class="line">CentOS 7 Systemd  </span><br><span class="line"></span><br><span class="line">Systemd：系统启动和服务器守护进程管理器，负责在系统启动或运行时，激活系统资源，服务器进程和其它进程</span><br><span class="line"></span><br><span class="line">Systemd新特性  </span><br><span class="line">- 系统引导时实现服务并行启动  </span><br><span class="line">- 按需启动守护进程  </span><br><span class="line">- 自动化的服务依赖关系管理  </span><br><span class="line">- 同时采用socket式与D-Bus总线式激活服务  </span><br><span class="line">- 系统状态快照  </span><br><span class="line">&gt; 并行启动服务大幅提高启动速度，利用socket解决服务依赖性</span><br><span class="line"></span><br><span class="line">- 核心概念：**unit**  </span><br><span class="line">unit表示不同类型的systemd对象，通过配置文件进行标识和配置；文件中主要包含了系统服务、监听socket、保存的系统快照以及其它与init相关的信息  </span><br><span class="line">- 配置文件  </span><br><span class="line">**/usr/lib/systemd/system**:每个服务最主要的启动脚本设置，类似于之前的/etc/init.d/  </span><br><span class="line">**/run/systemd/system**：系统执行过程中所产生的服务脚本，比上面目录优先运行  </span><br><span class="line">**/etc/systemd/system**：管理员建立的执行脚本，类似于/etc/rcN.d/Sxx的功能，比上面目录优先运行</span><br><span class="line"></span><br><span class="line">## Unit类型</span><br><span class="line"></span><br><span class="line">systemctl -t help 查看unit类型</span><br><span class="line">- **service** unit: 文件扩展名为.service, 用于定义系统服务</span><br><span class="line">- **Target** unit:文件扩展名为.target，用于模拟实现运行级别</span><br><span class="line">- Device unit: .device, 用于定义内核识别的设备</span><br><span class="line">- Mount unit: .mount, 定义文件系统挂载点</span><br><span class="line">- **Socket** unit: .socket, 用于标识进程间通信用的socket文件，也可在系统启动时，延迟启动服务，**实现按需启动**</span><br><span class="line">- Snapshot unit: .snapshot, 管理系统快照</span><br><span class="line">- Swap unit: .swap, 用于标识swap设备</span><br><span class="line">- Automount unit:.automount，文件系统的自动挂载点</span><br><span class="line">- Path unit: .path，用于定义文件系统中的一个文件或目录使用,常用于当文件系统变化时，延迟激活服务，如：spool 目录</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">- 关键特性：  </span><br><span class="line">基于socket的激活机制：socket与服务程序分离  </span><br><span class="line">基于d-bus的激活机制：   </span><br><span class="line">基于device的激活机制：   </span><br><span class="line">基于path的激活机制：    </span><br><span class="line">系统快照：保存各unit的当前状态信息于持久存储设备中    </span><br><span class="line">向后兼容sysv init脚本   </span><br><span class="line">- 不兼容：  </span><br><span class="line">systemctl命令固定不变，不可扩展  </span><br><span class="line">不是由systemd启动的服务，systemctl无法与之通信和控制</span><br><span class="line"></span><br><span class="line">## 管理服务</span><br><span class="line"></span><br><span class="line">**管理系统服务**：   </span><br><span class="line">CentOS 7: service unit</span><br><span class="line">注意：能兼容早期的服务脚本  </span><br><span class="line"></span><br><span class="line">命令：systemctl COMMAND name.service   </span><br><span class="line">- 启动：service name start ==&gt; systemctl start name.service  </span><br><span class="line">- 停止：service name stop ==&gt; systemctl stop name.service  </span><br><span class="line">- 重启：service name restart ==&gt; systemctl restart name.service  </span><br><span class="line">- 状态：service name status ==&gt; systemctl status name.service  </span><br><span class="line"></span><br><span class="line">&gt; 与service不同的是命令的所在位置，使用systemctl 可以同时启动或停止多个命令  </span><br><span class="line"></span><br><span class="line">- 禁止自动和手动启动：  </span><br><span class="line">systemctl mask name.service  </span><br><span class="line">- 取消禁止：  </span><br><span class="line">systemctl unmask name.service  </span><br><span class="line">&gt; 创建一个软链接到/dev/null，临时禁用服务  </span><br><span class="line"></span><br><span class="line">**服务查看**</span><br><span class="line"></span><br><span class="line">- 查看某服务当前激活与否的状态：  </span><br><span class="line">systemctl is-active name.service</span><br><span class="line">- 查看所有已经激活的服务：  </span><br><span class="line">systemctl list-units --type|-t service</span><br><span class="line">- 查看所有服务：  </span><br><span class="line">systemctl list-units --type service --all|-a</span><br><span class="line"></span><br><span class="line">chkconfig命令的对应关系：</span><br><span class="line"></span><br><span class="line">- 设定某服务开机自启：  </span><br><span class="line">chkconfig name on ==&gt; **systemctl enable name.service**</span><br><span class="line">- 设定某服务开机禁止启动：  </span><br><span class="line">chkconfig name off ==&gt; **systemctl disable name.service**  </span><br><span class="line">- 查看所有服务的开机自启状态：  </span><br><span class="line">chkconfig --list ==&gt; **systemctl list-unit-files** --type service</span><br><span class="line">- 用来列出该服务在哪些运行级别下启用和禁用：  </span><br><span class="line">chkconfig sshd –list ==&gt;</span><br><span class="line"> ls /etc/systemd/system/*.wants/sshd.service</span><br><span class="line">- 查看服务是否开机自启：  </span><br><span class="line">**systemctl is-enabled** name.service</span><br><span class="line">- 其它命令：</span><br><span class="line">查看服务的依赖关系：  </span><br><span class="line">systemctl list-dependencies name.service</span><br><span class="line">- 杀掉进程：  </span><br><span class="line">**systemctl kill** unitname</span><br><span class="line"></span><br><span class="line">**服务状态**  </span><br><span class="line"></span><br><span class="line">systemctl list-unit-files --type service --all显示状态</span><br><span class="line">- loaded Unit配置文件已处理</span><br><span class="line">- active(running) 一次或多次持续处理的运行</span><br><span class="line">- active(exited) 成功完成一次性的配置</span><br><span class="line">- active(waiting) 运行中，等待一个事件</span><br><span class="line">- inactive 不运行</span><br><span class="line">- enabled 开机启动</span><br><span class="line">- disabled 开机不启动</span><br><span class="line">- static 开机不启动，但可被另一个启用的服务激活</span><br><span class="line"></span><br><span class="line">## service unit文件格式</span><br><span class="line"></span><br><span class="line">/etc/systemd/system：系统管理员和用户使用  </span><br><span class="line">/usr/lib/systemd/system：发行版打包者使用  </span><br><span class="line">以&quot;#&quot;开头的行后面的内容会被认为是注释。   </span><br><span class="line">相关布尔值，1、yes、on、true都是开启，0、no、off、false 都是关闭。   </span><br><span class="line">时间单位默认是秒，所以要用毫秒（ms）分钟（m）等须显式说明。  </span><br><span class="line"></span><br><span class="line">service unit file文件通常由三部分组成：  </span><br><span class="line">- **[Unit]**：定义与Unit类型无关的通用选项；用于提供unit的描述信息、unit行</span><br><span class="line">为及依赖关系等</span><br><span class="line">- **[Service]**：与特定类型相关的专用选项；此处为Service类型</span><br><span class="line">- **[Install]**：定义由“systemctl enable”以及&quot;systemctl disable“命令在</span><br><span class="line">实现服务启用或禁用时用到的一些选项</span><br><span class="line"></span><br><span class="line">**[Unit]**段的常用选项：   </span><br><span class="line">- Description：描述信息  </span><br><span class="line">- After：定义unit的启动次序，表示当前unit应该晚于哪些unit启动，其功能与Before相反  </span><br><span class="line">- Requires：依赖到的其它units，强依赖，被依赖的units无法激活时，当前unit也无法激活  </span><br><span class="line">- Wants：依赖到的其它units，弱依赖  </span><br><span class="line">- Conflicts：定义units间的冲突关系   </span><br><span class="line"></span><br><span class="line">**[Service]**段的常用选项：</span><br><span class="line">- Type：定义影响ExecStart及相关参数的功能的unit进程启动类型</span><br><span class="line">- simple：默认值，这个daemon主要由ExecStart接的指令串来启动，启动后常驻于内存中</span><br><span class="line">- forking：由ExecStart启动的程序透过spawns延伸出其他子程序来作为此</span><br><span class="line">daemon的主要服务。原生父程序在启动结束后就会终止</span><br><span class="line">- oneshot：与simple类似，不过这个程序在工作完毕后就结束了，不会常驻在内存中</span><br><span class="line">- dbus：与simple类似，但这个daemon必须要在取得一个D-Bus的名称后，才会继续运作.因此通常也要同时设定BusNname= 才行</span><br><span class="line">- notify：在启动完成后会发送一个通知消息。还需要配合 NotifyAccess 来让Systemd 接收消息</span><br><span class="line">- idle：与simple类似，要执行这个daemon必须要所有的工作都顺利执行完毕后才会执行。这类的daemon通常是开机到最后才执行即可的服务</span><br><span class="line">- EnvironmentFile：环境配置文件</span><br><span class="line">- ExecStart：指明启动unit要运行命令或脚本的绝对路径</span><br><span class="line">- ExecStartPre： ExecStart前运行</span><br><span class="line">- ExecStartPost： ExecStart后运行</span><br><span class="line">- ExecStop：指明停止unit要运行的命令或脚本</span><br><span class="line">- Restart：当设定Restart=1 时，则当次daemon服务意外终止后，会再次自动</span><br><span class="line">启动此服务</span><br><span class="line"></span><br><span class="line">**[Install]**段的常用选项：</span><br><span class="line">- Alias：别名，可使用systemctl command Alias.service</span><br><span class="line">- RequiredBy：被哪些units所依赖，强依赖</span><br><span class="line">- WantedBy：被哪些units所依赖，弱依赖</span><br><span class="line">- Also：安装本服务的时候还要安装别的相关服务</span><br><span class="line"></span><br><span class="line">&gt; 注意：对于新创建的unit文件，或者修改了的unit文件，要通知systemd重载此配置文件,而后可以选择重启   </span><br><span class="line">systemctl daemon-reload</span><br></pre></td></tr></table></figure></p>
+<p>备份服务Unit示例<br>vim /etc/systemd/system/bak.service<br>[Unit]<br>Description=backup /etc<br>Requires=atd.service<br>[Service]<br>Type=simple #单次执行<br>ExecStart=/bin/bash -c “echo /testdir/bak.sh|at now” #激活后立即执行备份<br>[Install]<br>WantedBy=multi-user.target #运行在runlevel3</p>
+<p>systemctl daemon-reload<br>systemctl start bak<br><code>`</code></p>
+<h2 id="运行级别"><a href="#运行级别" class="headerlink" title="运行级别"></a>运行级别</h2><p><strong>target units</strong>：<br>unit配置文件：.target<br>ls /usr/lib/systemd/system/*.target<br>systemctl list-unit-files –type target –all   </p>
+<p><strong>运行级别</strong>：<br>0 ==&gt; runlevel0.target, poweroff.target<br>1 ==&gt; runlevel1.target, rescue.target<br>2 ==&gt; runlevel2.target, multi-user.target<br>3 ==&gt; runlevel3.target, multi-user.target<br>4 ==&gt; runlevel4.target, multi-user.target<br>5 ==&gt; runlevel5.target, graphical.target<br>6 ==&gt; runlevel6.target, reboot.target  </p>
+<p><strong>查看依赖性</strong>：<br>systemctl list-dependencies graphical.target</p>
+<p><strong>级别切换</strong>：<br>init N ==&gt; systemctl isolate name.target<br>例如：systemctl isolate multi-user.target<br>注：只有/lib/systemd/system/*.target文件中AllowIsolate=yes 才能切换   </p>
+<blockquote>
+<p>修改文件需执行systemctl daemon-reload才能生效</p>
+</blockquote>
+<p><strong>查看target</strong>：<br>runlevel ;who -r<br>systemctl list-units –type target  </p>
+<p><strong>获取默认运行级别</strong>：<br>/etc/inittab ==&gt; systemctl get-default</p>
+<p><strong>修改默认级别</strong>：<br>/etc/inittab ==&gt; systemctl set-default name.target<br>例如：<br>systemctl set-default multi-user.target<br>ls –l /etc/systemd/system/default.target   </p>
+<h2 id="其它命令"><a href="#其它命令" class="headerlink" title="其它命令"></a>其它命令</h2><ul>
+<li>切换至紧急救援模式：<br>systemctl rescue  </li>
+<li>切换至emergency模式：<br>systemctl emergency  </li>
+<li>其它常用命令：<br>传统命令init，poweroff，halt，reboot都成为<br>systemctl的软链接<br>关机：systemctl halt、systemctl poweroff<br>重启：systemctl reboot<br>挂起：systemctl suspend<br>休眠：systemctl hibernate<br>休眠并挂起：systemctl hybrid-sleep  </li>
+</ul>
+<h1 id="Centos7引导顺序"><a href="#Centos7引导顺序" class="headerlink" title="Centos7引导顺序"></a>Centos7引导顺序</h1><ol>
+<li>UEFi或BIOS初始化，运行POST开机自检</li>
+<li>选择启动设备</li>
+<li>引导装载程序, centos7是grub2</li>
+<li>加载装载程序的配置文件：<br>/etc/grub.d/<br>/etc/default/grub<br>/boot/grub2/grub.cfg #不需要手工编辑</li>
+<li>加载initramfs驱动模块</li>
+<li>加载内核选项</li>
+<li>内核初始化，centos7使用systemd代替init</li>
+<li>执行initrd.target所有单元，包括挂载/etc/fstab</li>
+<li>从initramfs根文件系统切换到磁盘根目录</li>
+<li>systemd执行默认target配置，配置文件/etc/systemd/system/default.target</li>
+<li>systemd执行sysinit.target初始化系统及basic.target准备操作系统</li>
+<li>systemd启动multi-user.target下的本机与服务器服务</li>
+<li>systemd执行multi-user.target下的/etc/rc.d/rc.local</li>
+<li>Systemd执行multi-user.target下的getty.target及登录服务</li>
+<li>systemd执行graphical需要的服务</li>
+</ol>
+<blockquote>
+<p>systemd-analyze plot  查看详细的启动流程和时间花费<br>systemd-analyze plot &gt;boot.html 重定向可以方便的使用网页查看</p>
+</blockquote>
+<p>设置内核参数，只影响当次启动</p>
+<ul>
+<li>启动时，在linux16行后添加systemd.unit=multi-user.target #指定运行在字符界面</li>
+<li>systemd.unit=emergency.target #急救模式</li>
+<li>systemd.unit=rescue.target  #维护模式 类似runlevel 1</li>
+<li>rescue.target 比emergency支持更多的功能，例如日志等</li>
+<li>systemctl default 进入默认target</li>
+</ul>
+<blockquote>
+<p>在启动界面修改运行级别时使用ctrl+x重启</p>
+</blockquote>
+<h2 id="启动排错"><a href="#启动排错" class="headerlink" title="启动排错"></a>启动排错</h2><ul>
+<li>文件系统损坏<br>先尝试自动修复，失败则进入emergency shell，提示用户修复</li>
+<li>在/etc/fstab不存在对应的设备和UUID<br>等一段时间，如不可用，进入emergency shell</li>
+<li>在/etc/fstab不存在对应挂载点<br>systemd 尝试创建挂载点，否则提示进入emergency shell.</li>
+<li>在/etc/fstab不正确的挂载选项<br>提示进入emergency shell</li>
+</ul>
+<p>进入emergency shell后</p>
+<ol>
+<li>输入root密码</li>
+<li>重新修改错误的/etc/fstab</li>
+<li>进行其它的排错  </li>
+</ol>
+<hr>
+<p>实验：破解centos7口令方法一</p>
+<ol>
+<li>启动时任意键暂停启动</li>
+<li>按e键进入编辑模式</li>
+<li>将光标移动linux16开始的行，添加内核参数rd.break，按ctrl-x启动<br><img src="https://note.youdao.com/yws/api/personal/file/DA739FDF9E9B43EDA33725D294597BBC?method=download&amp;shareKey=156437265744ec1f8469721c9e801d53" alt="grub">  </li>
+<li>mount –o remount,rw /sysroot</li>
+<li>chroot /sysroot<br><img src="https://note.youdao.com/yws/api/personal/file/49B4F43525CF4C71B90206024F394B78?method=download&amp;shareKey=b99e7af27353de5750e1b409bf339af0" alt="grub">    </li>
+<li>passwd root</li>
+<li>touch /.autorelabel #如果selinux开启需执行</li>
+<li>exit</li>
+<li>reboot</li>
+</ol>
+<hr>
+<p>实验：破解centos7口令方法二</p>
+<ol>
+<li>启动时任意键暂停启动</li>
+<li>按e键进入编辑模式</li>
+<li>将光标移动linux16开始的行，改为rw init=/sysroot/bin/sh，按ctrl-x启动<br><img src="https://note.youdao.com/yws/api/personal/file/EED58C583CFF4853A6E34B3A6C0F1018?method=download&amp;shareKey=445e770c01196284d1f50b8ebb93a255" alt="grub">  </li>
+<li>chroot /sysroot</li>
+<li>passwd root</li>
+<li>touch /.autorelabel</li>
+<li>exit</li>
+<li>reboot</li>
+</ol>
+<blockquote>
+<p>如果selinux开启，需touch /.autorelable</p>
+</blockquote>
+<hr>
+<p>实验：修复GRUB2<br>GRUB“the Grand Unified Bootloader”<br>引导提示时可以使用命令行界面<br>可从文件系统引导<br>主要配置文件 /boot/grub2/grub.cfg</p>
+<p>修复配置文件<br>grub2-mkconfig -o /boot/grub2/grub.cfg</p>
+<p>修复grub<br>grub2-install /dev/sda BIOS环境<br>grub2-install UEFI环境</p>
+<p>调整默认启动内核<br>vim /etc/default/grub<br>GRUB_DEFAULT=0</p>
+<ol>
+<li>/boot下的grub文件被破坏<br><img src="https://note.youdao.com/yws/api/personal/file/D83C6433B5204592A567FB1690D6F7DE?method=download&amp;shareKey=3a2251b22f4c8f4db54e4fc5d2cca40a" alt="grub">  </li>
+<li>进入光盘恢复模式</li>
+<li>chroot /mnt/sysimage</li>
+<li>grub2-install /dev/sda<br><img src="https://note.youdao.com/yws/api/personal/file/16087F504E3147AC9A3930BC9B1EA3BA?method=download&amp;shareKey=36cbea592b6a5d81fd752e8c243e2a24" alt="grub">  </li>
+<li>grub2-mkconfig -o /boot/grub2/grub.cfg<br><img src="https://note.youdao.com/yws/api/personal/file/3FACB6C698404BBF8E9F183738E7A0C0?method=download&amp;shareKey=3c505fbb9fc7ac321bf475e6cba74caa" alt="grub">  </li>
+<li>exit </li>
+<li>reboot</li>
+</ol>
+<blockquote>
+<p>grub2-setpassword 配置grub启动密码  </p>
+</blockquote>
+<hr>
+<p>实验：误删/boot/文件，恢复 </p>
+<ol>
+<li>光盘进入救援模式</li>
+<li>chroot /mnt/sysimage</li>
+<li>mount /dev/sr0 /mnt</li>
+<li>rpm -ivh /mnt/Packages/kernel-3.10… –force<br><img src="https://note.youdao.com/yws/api/personal/file/B94EAD135CB54F47811F06CD26C610D0?method=download&amp;shareKey=f693ef2238883bbfbb067bc88ab046a4" alt="grub">  </li>
+<li>grub2-install /dev/sda<br><img src="https://note.youdao.com/yws/api/personal/file/16087F504E3147AC9A3930BC9B1EA3BA?method=download&amp;shareKey=36cbea592b6a5d81fd752e8c243e2a24" alt="grub">  </li>
+<li>grub2-mkconfig -o /boot/grub2/grub.cfg<br><img src="https://note.youdao.com/yws/api/personal/file/3FACB6C698404BBF8E9F183738E7A0C0?method=download&amp;shareKey=3c505fbb9fc7ac321bf475e6cba74caa" alt="grub">  </li>
+<li>exit </li>
+<li>reboot</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux基础/" rel="tag"># linux基础</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/28/网络协议和管理/" rel="next" title="网络协议和管理">
+                <i class="fa fa-chevron-left"></i> 网络协议和管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/11/文本处理三剑客之AWK/" rel="prev" title="文本处理三剑客之AWK">
+                文本处理三剑客之AWK <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">nieW</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux组成"><span class="nav-number">1.</span> <span class="nav-text">Linux组成</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#内核"><span class="nav-number">1.1.</span> <span class="nav-text">内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动流程"><span class="nav-number">1.2.</span> <span class="nav-text">启动流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ramdisk管理"><span class="nav-number">1.2.1.</span> <span class="nav-text">ramdisk管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#init初始化"><span class="nav-number">1.2.2.</span> <span class="nav-text">init初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#chkconfig配置命令"><span class="nav-number">1.3.</span> <span class="nav-text">chkconfig配置命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行级别"><span class="nav-number">1.4.</span> <span class="nav-text">运行级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它命令"><span class="nav-number">1.5.</span> <span class="nav-text">其它命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Centos7引导顺序"><span class="nav-number">2.</span> <span class="nav-text">Centos7引导顺序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#启动排错"><span class="nav-number">2.1.</span> <span class="nav-text">启动排错</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nieW</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
